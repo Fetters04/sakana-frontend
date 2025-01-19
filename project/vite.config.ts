@@ -12,7 +12,16 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve('./src')  // 用 @ 代替 src
+      '@': path.resolve(__dirname, './src')  // 用 @ 代替 src
+    }
+  },
+  // scss全局变量配置
+  css: {
+    preprocessorOptions: {
+      scss: {
+        javascriptEnabled: true,
+        additionalData: '@import "@/styles/variable.scss";'
+      }
     }
   }
 });

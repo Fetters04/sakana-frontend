@@ -1,7 +1,6 @@
 <template>
   <div>
-    <h1>SVG 测试</h1>
-    <svg-icon name="home" width="30px" height="30px"></svg-icon>
+    <h1>测试</h1>
   </div>
 </template>
 
@@ -9,6 +8,10 @@
 
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+div {
+  h1 {
+    color: $color;
+  }
+}
 </style>
