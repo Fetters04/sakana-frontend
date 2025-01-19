@@ -13,6 +13,9 @@ dependencies:
   vue:
     specifier: ^3.5.13
     version: registry.npmmirror.com/vue@3.5.13(typescript@5.6.2)
+  vue-router:
+    specifier: ^4.5.0
+    version: registry.npmmirror.com/vue-router@4.5.0(vue@3.5.13)
 
 devDependencies:
   '@eslint/js':
@@ -1322,6 +1325,12 @@ packages:
       de-indent: registry.npmmirror.com/de-indent@1.0.2
       he: registry.npmmirror.com/he@1.2.0
     dev: true
+
+  registry.npmmirror.com/@vue/devtools-api@6.6.4:
+    resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@vue/devtools-api/-/devtools-api-6.6.4.tgz}
+    name: '@vue/devtools-api'
+    version: 6.6.4
+    dev: false
 
   registry.npmmirror.com/@vue/language-core@2.2.0(typescript@5.6.2):
     resolution: {integrity: sha512-O1ZZFaaBGkKbsRfnVH1ifOK1/1BUkyK+3SQsfnh6PmMmD4qJcTU8godCeA96jjDRTL6zgnK7YzCHfaUlH2r0Mw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@vue/language-core/-/language-core-2.2.0.tgz}
@@ -6068,6 +6077,18 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  registry.npmmirror.com/vue-router@4.5.0(vue@3.5.13):
+    resolution: {integrity: sha512-HDuk+PuH5monfNuY+ct49mNmkCRK4xJAV9Ts4z9UFc4rzdDnxQLyCMGGc8pKhZhHTVzfanpNwB/lwqevcBwI4w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue-router/-/vue-router-4.5.0.tgz}
+    id: registry.npmmirror.com/vue-router/4.5.0
+    name: vue-router
+    version: 4.5.0
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      '@vue/devtools-api': registry.npmmirror.com/@vue/devtools-api@6.6.4
+      vue: registry.npmmirror.com/vue@3.5.13(typescript@5.6.2)
+    dev: false
 
   registry.npmmirror.com/vue-tsc@2.2.0(typescript@5.6.2):
     resolution: {integrity: sha512-gtmM1sUuJ8aSb0KoAFmK9yMxb8TxjewmxqTJ1aKphD5Cbu0rULFY6+UQT51zW7SpUcenfPUuflKyVwyx9Qdnxg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue-tsc/-/vue-tsc-2.2.0.tgz}
