@@ -13,6 +13,8 @@ import globalComponent from './components';
 import './styles/index.scss';
 // 引入路由
 import router from './router';
+// 引入pinia仓库
+import pinia from './store';
 
 const app = createApp(App);
 
@@ -23,5 +25,7 @@ app.use(ElementPlus, {
 app.use(globalComponent);
 // 注册模板路由
 app.use(router);
+// 安装仓库
+app.use(pinia);
 
 app.mount('#app');
