@@ -3,13 +3,14 @@
     <el-row>
       <el-col :span="12" :xs="0"></el-col>
       <el-col :span="12" :xs="24">
-        <el-form class="login_form">
+        <!--登录表单-->
+        <el-form class="login_form" :model="loginForm" :rules="rules" ref="loginForms">
           <h1>Hello</h1>
-          <h2>欢迎来到甄选平台</h2>
-          <el-form-item>
+          <h2>欢迎来到甄选运营平台</h2>
+          <el-form-item prop="username">
             <el-input :prefix-icon="User" v-model="loginForm.username"></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item prop="password">
             <el-input type="password" :prefix-icon="Lock" v-model="loginForm.password" show-password></el-input>
           </el-form-item>
           <el-form-item>
@@ -23,24 +24,30 @@
 </template>
 
 <script setup lang="ts">
-import {User, Lock} from '@element-plus/icons-vue';
-import {reactive, ref} from 'vue';
+import { User, Lock } from '@element-plus/icons-vue';
+import { reactive, ref } from 'vue';
 // 引入用户相关的小仓库
 import useUserStore from '@/store/modules/user.ts';
-import {useRouter} from 'vue-router';
-import {ElNotification} from 'element-plus';
+import { useRouter } from 'vue-router';
+import { ElNotification } from 'element-plus';
 // 引入获取当前时间的函数
-import {getTime} from '@/utils/time.ts';
+import { getTime } from '@/utils/time.ts';
 
+// 获取el-form组件
+let loginForms = ref();
+// 创建用户仓库
 let useStore = useUserStore();
 // 获取路由器
 let $router = useRouter();
 // 控制按钮加载效果
 let loading = ref(false);
 // 收集账号与密码的数据
-let loginForm = reactive({username: 'admin', password: '111111'});
+let loginForm = reactive({ username: 'admin', password: '111111' });
 // 登录按钮回调
 const login = async () => {
+  // 保证全部表单项校验通过再发请求
+  await loginForms.value.validate();
+  // 加载效果：开始加载...
   loading.value = true;
   try {
     // 保证登录成功
@@ -64,6 +71,17 @@ const login = async () => {
       message: (error as Error).message
     });
   }
+};
+
+// 定义表单校验需要的配置对象
+const rules = {
+  username: [
+    { required: true, message: '用户名不能为空', trigger: 'blur' },
+    { required: true, min: 6, max: 10, message: '用户名长度至少6位', trigger: 'change' }
+  ],
+  password: [
+    { required: true, min: 6, max: 15, message: '密码长度至少6位', trigger: 'change' }
+  ]
 };
 </script>
 
