@@ -13,7 +13,8 @@
             <el-input type="password" :prefix-icon="Lock" v-model="loginForm.password" show-password></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button :loading="loading" class="login_btn" type="primary" size="default" @click="login">登录</el-button>
+            <el-button :loading="loading" class="login_btn" type="primary" size="default" @click="login">登录
+            </el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -28,6 +29,8 @@ import {reactive, ref} from 'vue';
 import useUserStore from '@/store/modules/user.ts';
 import {useRouter} from 'vue-router';
 import {ElNotification} from 'element-plus';
+// 引入获取当前时间的函数
+import {getTime} from '@/utils/time.ts';
 
 let useStore = useUserStore();
 // 获取路由器
@@ -47,7 +50,8 @@ const login = async () => {
     // 登录成功提示信息
     ElNotification({
       type: 'success',
-      message: '登录成功'
+      message: '欢迎回来',
+      title: `HI, ${getTime()}好`
     });
     // 登录成功加载效果消失
     loading.value = false;
