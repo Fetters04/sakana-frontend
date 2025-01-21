@@ -17,7 +17,7 @@
     <div class="layout_tabbar">222</div>
     <!--内容展示区域-->
     <div class="layout_main">
-      <p style="height: 3000px; background: red">hhhhhhhhh</p>
+      <Main></Main>
     </div>
   </div>
 </template>
@@ -27,6 +27,8 @@
 import Logo from './logo/index.vue';
 // 引入菜单组件
 import Menu from './menu/index.vue';
+// 内容展示区
+import Main from './main/index.vue';
 // 获取用户相关的小仓库
 import useUserStore from '@/store/modules/user.ts';
 
@@ -46,6 +48,7 @@ let userStore = useUserStore();
     .scrollbar {
       width: 100%;
       height: calc(100vh - $base-menu-logo-height);
+
       .el-menu {
         border-right: none;
       }
