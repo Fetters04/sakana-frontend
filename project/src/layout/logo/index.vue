@@ -17,7 +17,6 @@ import setting from '@/setting.ts';
   height: $base-menu-logo-height;
   color: white;
   align-items: center;
-  padding-top: 40px;
 
   img {
     width: 80px;
