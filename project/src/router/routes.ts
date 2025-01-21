@@ -7,7 +7,8 @@ export const constantRoute = [
     name: 'login',
     meta: {
       title: '登录',  // 菜单标题
-      hidden: true  // 代表路由标题在菜单中是否隐藏
+      hidden: true,  // 代表路由标题在菜单中是否隐藏
+      icon: 'Promotion'
     }
   },
   {
@@ -17,7 +18,8 @@ export const constantRoute = [
     name: 'layout',
     meta: {
       title: 'layout',
-      hidden: false
+      hidden: false,
+      icon: 'Avatar'
     },
     children: [
       {
@@ -25,15 +27,8 @@ export const constantRoute = [
         component: () => import('@/views/home/index.vue'),
         meta: {
           title: '首页',
-          hidden: false
-        }
-      },
-      {
-        path: '/test',
-        component: () => import('@/views/home/index.vue'),
-        meta: {
-          title: '测试',
-          hidden: false
+          hidden: false,
+          icon: 'HomeFilled'
         }
       }
     ]
@@ -45,7 +40,8 @@ export const constantRoute = [
     name: '404',
     meta: {
       title: '404',
-      hidden: true
+      hidden: true,
+      icon: 'DocumentDelete'
     }
   },
   {
@@ -54,7 +50,8 @@ export const constantRoute = [
     name: 'Any',
     meta: {
       title: '任意',
-      hidden: true
+      hidden: true,
+      icon: 'DataLine'
     }
   }
 ];
