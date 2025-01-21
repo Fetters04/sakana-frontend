@@ -43,6 +43,7 @@ let $router = useRouter();
 let loading = ref(false);
 // 收集账号与密码的数据
 let loginForm = reactive({ username: 'admin', password: '111111' });
+
 // 登录按钮回调
 const login = async () => {
   // 保证全部表单项校验通过再发请求
@@ -73,14 +74,34 @@ const login = async () => {
   }
 };
 
+/**
+ * 自定义校验规则函数
+ * @param rule  校验规则对象
+ * @param value 表单元素文本内容
+ * @param callback  符合callback放行，不符合注入错误提示信息
+ */
+const validatorUserName = (rule: any, value: any, callback: any) => {
+  if (value.length >= 5) {
+    callback();
+  } else {
+    callback(new Error('用户名长度至少5位'));
+  }
+};
+const validatorPassword = (rule: any, value: any, callback: any) => {
+  if (value.length >= 6) {
+    callback();
+  } else {
+    callback(new Error('密码长度至少6位'));
+  }
+};
+
 // 定义表单校验需要的配置对象
 const rules = {
   username: [
-    { required: true, message: '用户名不能为空', trigger: 'blur' },
-    { required: true, min: 6, max: 10, message: '用户名长度至少6位', trigger: 'change' }
+    { trigger: 'change', validator: validatorUserName }
   ],
   password: [
-    { required: true, min: 6, max: 15, message: '密码长度至少6位', trigger: 'change' }
+    { trigger: 'change', validator: validatorPassword }
   ]
 };
 </script>
