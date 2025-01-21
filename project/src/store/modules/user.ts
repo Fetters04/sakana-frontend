@@ -1,18 +1,21 @@
 // 创建用户相关小仓库
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
 // 引入接口
-import {reqLogin} from '@/api/user';
+import { reqLogin } from '@/api/user';
 // 引入数据类型
-import type {loginForm, loginResponseData} from '@/api/user/type.ts';
-import type {UserState} from './types/type.ts';
+import type { loginForm, loginResponseData } from '@/api/user/type.ts';
+import type { UserState } from './types/type.ts';
 // 引入操作本地存储的工具方法
-import {SET_TOKEN, GET_TOKEN} from '@/utils/token.ts';
+import { SET_TOKEN, GET_TOKEN } from '@/utils/token.ts';
+// 引入路由（常量路由）
+import { constantRoute } from '@/router/routes';
 
 let useUserStore = defineStore('User', {
   // 小仓库存储数据地方
   state: (): UserState => {
     return {
-      token: GET_TOKEN()
+      token: GET_TOKEN(),   // 存储用户唯一标识 token
+      menuRoutes: constantRoute   // 存储生成菜单所需数组（路由）
     };
   },
   // 异步|逻辑地方
