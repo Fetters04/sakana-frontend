@@ -14,6 +14,12 @@ import Breadcrumb from './breadcrumb/index.vue';
 import Setting from './setting/index.vue';
 </script>
 
+<script lang="ts">
+export default {
+  name: 'Tabbar'
+};
+</script>
+
 <style scoped lang="scss">
 .tabbar {
   display: flex;

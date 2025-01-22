@@ -1,7 +1,7 @@
 <template>
   <div class="layout_container">
     <!--左侧菜单-->
-    <div class="layout_slider">
+    <div class="layout_slider" :class="{fold: layoutSettingStore.fold}">
       <!--logo组件-->
       <Logo></Logo>
       <!--展示菜单-->
@@ -12,6 +12,7 @@
             background-color="#001529"
             text-color="white"
             active-text-color="skyblue"
+            :collapse="layoutSettingStore.fold"
         >
           <!--根据路由动态生成菜单-->
           <Menu :menuList="userStore.menuRoutes"></Menu>
@@ -19,11 +20,11 @@
       </el-scrollbar>
     </div>
     <!--顶部导航-->
-    <div class="layout_tabbar">
+    <div class="layout_tabbar" :class="{fold: layoutSettingStore.fold}">
       <Tabbar></Tabbar>
     </div>
     <!--内容展示区域-->
-    <div class="layout_main">
+    <div class="layout_main" :class="{fold: layoutSettingStore.fold}">
       <Main></Main>
     </div>
   </div>
@@ -38,13 +39,21 @@ import Menu from './menu/index.vue';
 import Main from './main/index.vue';
 // 引入顶部组件
 import Tabbar from './tabbar/index.vue';
-// 获取用户相关的小仓库
+// 获取相关小仓库
 import useUserStore from '@/store/modules/user.ts';
+import useLayoutSettingStore from '@/store/modules/setting';
 // 获取路由对象
 import { useRoute } from 'vue-router';
 
 let userStore = useUserStore();
+let layoutSettingStore = useLayoutSettingStore();
 let $router = useRoute();
+</script>
+
+<script lang="ts">
+export default {
+  name: 'Layout'
+};
 </script>
 
 <style scoped lang="scss">
@@ -57,6 +66,7 @@ let $router = useRoute();
     height: 100vh;
     background: $base-menu-background;
     color: white;
+    transition: all 0.3s;
 
     .scrollbar {
       width: 100%;
@@ -66,6 +76,10 @@ let $router = useRoute();
         border-right: none;
       }
     }
+
+    &.fold {
+      width: $base-menu-min-width;
+    }
   }
 
   .layout_tabbar {
@@ -74,6 +88,12 @@ let $router = useRoute();
     height: $base-tabbar-height;
     top: 0;
     left: $base-menu-width;
+    transition: all 0.3s;
+
+    &.fold {
+      width: calc(100vw - $base-menu-min-width);
+      left: $base-menu-min-width;
+    }
   }
 
   .layout_main {
@@ -85,6 +105,12 @@ let $router = useRoute();
     left: $base-menu-width;
     top: $base-tabbar-height;
     overflow: auto;
+    transition: all 0.3s;
+
+    &.fold {
+      width: calc(100vw - $base-menu-min-width);
+      left: $base-menu-min-width;
+    }
   }
 }
 </style>
