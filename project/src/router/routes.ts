@@ -17,9 +17,9 @@ export const constantRoute = [
     component: () => import('@/layout/index.vue'),
     name: 'Layout',
     meta: {
-      title: 'layout',
+      title: '',
       hidden: false,
-      icon: 'Avatar'
+      icon: ''
     },
     redirect: '/home',
     children: [
@@ -54,6 +54,7 @@ export const constantRoute = [
       title: '权限管理',
       icon: 'Lock'
     },
+    redirect: '/acl/user',
     children: [
       {
         // 用户管理
@@ -96,6 +97,7 @@ export const constantRoute = [
       title: '商品管理',
       icon: 'Goods'
     },
+    redirect: '/product/trademark',
     children: [
       {
         // 品牌管理
