@@ -1,5 +1,5 @@
 <template>
-  <el-button size="default" icon="Refresh" circle></el-button>
+  <el-button size="default" icon="Refresh" circle @click="updateRefresh"></el-button>
   <el-button size="default" icon="FullScreen" circle></el-button>
   <el-button size="default" icon="Setting" circle></el-button>
   <!--用户头像-->
@@ -22,6 +22,14 @@
 
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue';
+import useLayoutSettingStore from '@/store/modules/setting';
+
+// 获取骨架的小仓库
+let layoutSettingStore = useLayoutSettingStore();
+// 刷新按钮点击回调
+const updateRefresh = () => {
+  layoutSettingStore.refresh = !layoutSettingStore.refresh;
+};
 </script>
 
 <script lang="ts">
