@@ -3,11 +3,11 @@
   <el-button size="default" icon="FullScreen" circle @click="fullScreen"></el-button>
   <el-button size="default" icon="Setting" circle></el-button>
   <!--用户头像-->
-  <img src="../../../../public/logo.png" alt="logo">
+  <img :src="userStore.avatar" alt="logo">
   <!--下拉菜单-->
   <el-dropdown>
         <span>
-          admin
+          {{ userStore.username }}
           <el-icon>
             <arrow-down/>
           </el-icon>
@@ -23,9 +23,12 @@
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue';
 import useLayoutSettingStore from '@/store/modules/setting';
+import useUserStore from '@/store/modules/user';
 
 // 获取骨架的小仓库
 let layoutSettingStore = useLayoutSettingStore();
+// 获取用户的小仓库
+let userStore = useUserStore();
 // 刷新按钮点击回调
 const updateRefresh = () => {
   layoutSettingStore.refresh = !layoutSettingStore.refresh;
@@ -55,6 +58,8 @@ export default {
 img {
   margin: 0 20px;
   width: 60px;
+  height: 60px;
+  border-radius: 50%;
 }
 
 .el-dropdown {
