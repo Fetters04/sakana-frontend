@@ -6,7 +6,7 @@ import { reqLogin, reqUserInfo } from '@/api/user';
 import type { loginForm, loginResponseData } from '@/api/user/type.ts';
 import type { UserState } from './types/type.ts';
 // 引入操作本地存储的工具方法
-import { SET_TOKEN, GET_TOKEN } from '@/utils/token.ts';
+import { GET_TOKEN, REMOVE_TOKEN, SET_TOKEN } from '@/utils/token.ts';
 // 引入路由（常量路由）
 import { constantRoute } from '@/router/routes';
 
@@ -50,6 +50,13 @@ let useUserStore = defineStore('User', {
       } else {
 
       }
+    },
+    // 退出登录方法
+    userLogout() {
+      this.token = '';
+      this.username = '';
+      this.avatar = '';
+      REMOVE_TOKEN();
     }
   },
   // 计算属性
