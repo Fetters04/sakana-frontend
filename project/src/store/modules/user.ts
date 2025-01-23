@@ -40,15 +40,15 @@ let useUserStore = defineStore('User', {
     },
     // 获取用户信息方法
     async userInfo() {
-      // 获取用户信息存储到仓库（头像、名字）
+      // 获取用户信息
       let result = await reqUserInfo();
-      console.log(result);
-      // 如果获取用户信息成功
+      // 如果获取用户信息成功，存储到仓库（头像、名字）
       if (result.code == 200) {
         this.username = result.data.checkUser.username;
         this.avatar = result.data.checkUser.avatar;
+        return 'ok';
       } else {
-
+        return Promise.reject('获取用户信息失败');
       }
     },
     // 退出登录方法
