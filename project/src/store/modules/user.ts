@@ -7,6 +7,7 @@ import type { UserState } from './types/type.ts';
 import { GET_TOKEN, REMOVE_TOKEN, SET_TOKEN } from '@/utils/token.ts';
 // 引入路由（常量路由）
 import { constantRoute } from '@/router/routes';
+import { loginFormData, loginResponseData, userInfoResponseData } from '@/api/user/type';
 
 let useUserStore = defineStore('User', {
   // 小仓库存储数据地方
@@ -21,9 +22,9 @@ let useUserStore = defineStore('User', {
   // 异步|逻辑地方
   actions: {
     // 用户登录方法
-    async userLogin(data: any) {
+    async userLogin(data: loginFormData) {
       // 登录请求
-      let result: any = await reqLogin(data);
+      let result: loginResponseData = await reqLogin(data);
       if (result.code == 200) {
         // pinia存储token
         this.token = (result.data as string);
@@ -39,7 +40,7 @@ let useUserStore = defineStore('User', {
     // 获取用户信息方法
     async userInfo() {
       // 获取用户信息
-      let result = await reqUserInfo();
+      let result: userInfoResponseData = await reqUserInfo();
       // 如果获取用户信息成功，存储到仓库（头像、名字）
       if (result.code == 200) {
         this.username = result.data.username;
@@ -52,7 +53,7 @@ let useUserStore = defineStore('User', {
     // 退出登录方法
     async userLogout() {
       // 退出登录请求
-      let result = await reqLogout();
+      let result: any = await reqLogout();
       console.log(result);
       if (result.code == 200) {
         this.token = '';
