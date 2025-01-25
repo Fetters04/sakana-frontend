@@ -97,7 +97,6 @@ export default {
     padding: 20px;
     width: calc(100% - $base-menu-width);
     height: calc(100vh - $base-tabbar-height);
-    background: yellowgreen;
     left: $base-menu-width;
     top: $base-tabbar-height;
     overflow: auto;

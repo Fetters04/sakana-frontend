@@ -1,11 +1,40 @@
 <template>
-  <div>
-    <h1>品牌管理</h1>
-  </div>
+  <el-card class="box-card">
+    <!--添加品牌按钮-->
+    <el-button type="primary" size="large" icon="Plus">添加品牌</el-button>
+    <!--表格组件：展示数据-->
+    <el-table style="margin: 20px 0" border>
+      <el-table-column label="序号" width="150px" align="center"/>
+      <el-table-column label="品牌名称" align="center"/>
+      <el-table-column label="品牌LOGO" align="center"/>
+      <el-table-column label="品牌操作" align="center"/>
+    </el-table>
+    <!-- 分页器组件
+         pagination
+            v-model:current-page: 当前页数
+            v-model:page-size: 每页显示条目个数
+            page-sizes: 每页显示个数选择器的选项设置
+            background:	是否为分页按钮添加背景色
+            layout:	设置六个子组件布局
+    -->
+    <el-pagination
+        v-model:current-page="pageNo"
+        v-model:page-size="pageSize"
+        :page-sizes="[5, 10, 20]"
+        :background="true"
+        layout="prev, pager, next, jumper, ->, sizes, total"
+        :total="40"
+    />
+  </el-card>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 
+// 当前页数
+let pageNo = ref<number>(1);
+// 每页显示条目个数
+let pageSize = ref<number>(10);
 </script>
 
 <style scoped lang="scss">
