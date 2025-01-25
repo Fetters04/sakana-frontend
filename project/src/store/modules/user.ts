@@ -1,9 +1,7 @@
 // 创建用户相关小仓库
 import { defineStore } from 'pinia';
 // 引入接口
-import { reqLogin, reqUserInfo } from '@/api/user';
-// 引入数据类型
-import type { loginForm, loginResponseData } from '@/api/user/type.ts';
+import { reqLogin, reqUserInfo, reqLogout } from '@/api/user';
 import type { UserState } from './types/type.ts';
 // 引入操作本地存储的工具方法
 import { GET_TOKEN, REMOVE_TOKEN, SET_TOKEN } from '@/utils/token.ts';
@@ -23,19 +21,19 @@ let useUserStore = defineStore('User', {
   // 异步|逻辑地方
   actions: {
     // 用户登录方法
-    async userLogin(data: loginForm) {
+    async userLogin(data: any) {
       // 登录请求
-      let result: loginResponseData = await reqLogin(data);
+      let result: any = await reqLogin(data);
       if (result.code == 200) {
         // pinia存储token
-        this.token = (result.data.token as string);
+        this.token = (result.data as string);
         // 本地持久化存储token
-        SET_TOKEN((result.data.token as string));
+        SET_TOKEN((result.data as string));
 
         // 保证返回一个成功的promise
         return 'ok';
       } else {
-        return Promise.reject(new Error(result.data.message));
+        return Promise.reject(new Error(result.data));
       }
     },
     // 获取用户信息方法
@@ -44,19 +42,27 @@ let useUserStore = defineStore('User', {
       let result = await reqUserInfo();
       // 如果获取用户信息成功，存储到仓库（头像、名字）
       if (result.code == 200) {
-        this.username = result.data.checkUser.username;
-        this.avatar = result.data.checkUser.avatar;
+        this.username = result.data.username;
+        this.avatar = result.data.avatar;
         return 'ok';
       } else {
         return Promise.reject('获取用户信息失败');
       }
     },
     // 退出登录方法
-    userLogout() {
-      this.token = '';
-      this.username = '';
-      this.avatar = '';
-      REMOVE_TOKEN();
+    async userLogout() {
+      // 退出登录请求
+      let result = await reqLogout();
+      console.log(result);
+      if (result.code == 200) {
+        this.token = '';
+        this.username = '';
+        this.avatar = '';
+        REMOVE_TOKEN();
+        return 'ok';
+      }
+
+      return Promise.reject('退出登录失败');
     }
   },
   // 计算属性

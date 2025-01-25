@@ -53,10 +53,9 @@ const fullScreen = () => {
   }
 };
 // 退出登录点击回调
-const logout = () => {
-  // 向服务端发请求（无服务端退出登录接口）
-  // 清除用户数据
-  userStore.userLogout();
+const logout = async () => {
+  // 向服务端发请求
+  await userStore.userLogout();
   // 跳转到登录页面
   $router.push({ path: '/login', query: { redirect: $route.path } });
 };
