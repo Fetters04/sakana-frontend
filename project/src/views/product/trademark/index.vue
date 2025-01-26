@@ -17,8 +17,8 @@
       </el-table-column>
       <el-table-column label="品牌操作" align="center">
         <template #="{row, $index}">
-          <el-button type="primary" size="default" icon="Edit"></el-button>
-          <el-button type="primary" size="default" icon="Delete"></el-button>
+          <el-button type="success" size="default" icon="Edit"></el-button>
+          <el-button type="danger" size="default" icon="Delete"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -33,10 +33,12 @@
     <el-pagination
         v-model:current-page="pageNo"
         v-model:page-size="pageSize"
-        :page-sizes="[5, 10, 20]"
+        :page-sizes="[3, 5, 10]"
         :background="true"
         layout="prev, pager, next, jumper, ->, sizes, total"
         :total="total"
+        @current-change="getHasTrademark"
+        @size-change="getHasTrademark(1)"
     />
   </el-card>
 </template>
@@ -56,7 +58,8 @@ let total = ref<number>(0);
 let trademarkArr = ref<Records>([]);
 
 // 获取已有品牌
-const getHasTrademark = async () => {
+const getHasTrademark = async (pager = 1) => {
+  pageNo.value = pager;
   let result: TrademarkResponseData = await reqHasTrademark(pageNo.value, pageSize.value);
   if (result.code == 200) {
     total.value = result.data.total;
