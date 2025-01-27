@@ -47,17 +47,24 @@
     <!--表单-->
     <el-form style="width: 80%">
       <el-form-item label="品牌名称" label-width="100px">
-        <el-input placeholder="请输入品牌名称"></el-input>
+        <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
       </el-form-item>
       <el-form-item label="品牌LOGO" label-width="100px">
+        <!--
+          上传资源
+              action: 图片资源的请求存放地址
+              show-file-list: 是否显示已上传的文件列表
+              before-upload: 上传文件之前的钩子，参数为当前文件对象
+              on-success: 上传文件成功的钩子
+        -->
         <el-upload
             class="avatar-uploader"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            action="/api/product/fileUpload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
         >
-          <img v-if="imageUrl" :src="imageUrl" alt="" class="avatar"/>
+          <img v-if="trademarkParams.logoUrl" :src="trademarkParams.logoUrl" alt="" class="avatar"/>
           <el-icon v-else class="avatar-uploader-icon">
             <Plus/>
           </el-icon>
@@ -73,9 +80,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { reqHasTrademark } from '@/api/product/trademark';
-import { Records, TrademarkResponseData } from '@/api/product/trademark/type';
+import { Records, Trademark, TrademarkResponseData } from '@/api/product/trademark/type';
+import { ElMessage, UploadProps } from 'element-plus';
 
 // 当前页数
 let pageNo = ref<number>(1);
@@ -87,6 +95,11 @@ let total = ref<number>(0);
 let trademarkArr = ref<Records>([]);
 // 控制对话框显示与隐藏
 let dialogFormVisible = ref<boolean>(false);
+// 定义收集新增品牌的数据
+let trademarkParams = reactive<Trademark>({
+  tmName: '',
+  logoUrl: ''
+});
 
 // 获取已有品牌
 const getHasTrademark = async (pager = 1) => {
@@ -120,6 +133,33 @@ const cancel = () => {
 const confirm = () => {
   // 对话框隐藏
   dialogFormVisible.value = false;
+};
+
+// 上传图片之前触发的钩子函数，限制上传图片的类型和大小
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  // 要求：上传文件格式 jpg|png|gif 4M
+  if (rawFile.type == 'image/jpeg' || rawFile.type == 'image/png' || rawFile.type == 'image/gif') {
+    if (rawFile.size / 1024 / 1024 < 4) {
+      return true;
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '上传文件大小应小于4M'
+      });
+      return false;
+    }
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '上传文件格式务必为 jpg, png, gif'
+    });
+    return false;
+  }
+};
+// 图片上传成功钩子
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+  // 收集上次图片的地址，添加品牌的时候带给服务器
+  trademarkParams.logoUrl = response.data;
 };
 </script>
 
