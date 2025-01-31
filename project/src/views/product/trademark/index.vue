@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { reqHasTrademark } from '@/api/product/trademark';
+import { reqAddOrUpdateTrademark, reqHasTrademark } from '@/api/product/trademark';
 import { Records, Trademark, TrademarkResponseData } from '@/api/product/trademark/type';
 import { ElMessage, UploadProps } from 'element-plus';
 
@@ -118,6 +118,9 @@ onMounted(() => {
 const addTrademark = () => {
   // 对话框显示
   dialogFormVisible.value = true;
+  // 收集数据情况
+  trademarkParams.tmName = '';
+  trademarkParams.logoUrl = '';
 };
 // 修改品牌按钮回调
 const updateTrademark = () => {
@@ -130,8 +133,25 @@ const cancel = () => {
   dialogFormVisible.value = false;
 };
 // 对话框底部确定按钮回调
-const confirm = () => {
-  // 对话框隐藏
+const confirm = async () => {
+  let result: any = await reqAddOrUpdateTrademark(trademarkParams);
+  // 添加品牌成功
+  if (result.code == 200) {
+    // 弹出提示信息
+    ElMessage({
+      type: 'success',
+      message: '添加品牌成功'
+    });
+    // 再次获取全部已有品牌数据
+    getHasTrademark();
+  } else {
+    // 添加品牌失败
+    ElMessage({
+      type: 'error',
+      message: '添加品牌失败'
+    });
+  }
+  // 关闭对话框
   dialogFormVisible.value = false;
 };
 
