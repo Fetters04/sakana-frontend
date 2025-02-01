@@ -19,7 +19,12 @@
       <el-table-column label="品牌操作" align="center">
         <template #="{row, $index}">
           <el-button type="success" size="default" icon="Edit" @click="updateTrademark(row)"></el-button>
-          <el-button type="danger" size="default" icon="Delete"></el-button>
+          <el-popconfirm :title="`您确定要删除${row.tmName}？`" width="200px" icon="Delete"
+                         @confirm="removeTrademark(row.id)">
+            <template #reference>
+              <el-button type="danger" size="default" icon="Delete"></el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -81,7 +86,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import { reqAddOrUpdateTrademark, reqHasTrademark } from '@/api/product/trademark';
+import { reqAddOrUpdateTrademark, reqDeleteTrademark, reqHasTrademark } from '@/api/product/trademark';
 import { Records, Trademark, TrademarkResponseData } from '@/api/product/trademark/type';
 import { ElMessage, UploadProps } from 'element-plus';
 
@@ -222,7 +227,6 @@ const validatorLogoUrl = (rule: any, value: any, callback: any) => {
     callback(new Error('LOGO图片务必上传'));
   }
 };
-
 // 表单校验规则对象
 const rules = {
   tmName: [
@@ -231,6 +235,25 @@ const rules = {
   logoUrl: [
     { required: true, validator: validatorLogoUrl }
   ]
+};
+
+// 气泡确认框确定按钮的回调
+const removeTrademark = async (id: number) => {
+  // 发送删除请求
+  let result = await reqDeleteTrademark(id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除品牌成功'
+    });
+    // 再次获取已有品牌数据
+    await getHasTrademark(trademarkArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除品牌失败'
+    });
+  }
 };
 </script>
 
