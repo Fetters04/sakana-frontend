@@ -23,7 +23,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import useCategoryStore from '@/store/modules/category';
-import category from '@/store/modules/category';
 
 let categoryStore = useCategoryStore();
 

@@ -18,3 +18,24 @@ export interface CategoryObj {
 export interface CategoryResponseData extends ResponseData {
   data: CategoryObj[];
 }
+
+// 属性值对象类型
+export interface AttrValue {
+  id: number;
+  valueName: string;
+  attrId: number;
+}
+
+// 属性对象
+export interface Attr {
+  id: number;
+  attrName: string;
+  categoryId: number;
+  categoryLevel: number;
+  attrValueList: AttrValue[];
+}
+
+// 属性接口返回的数据类型
+export interface AttrResponseData extends ResponseData {
+  data: Attr[];
+}

@@ -14,7 +14,11 @@ let useCategoryStore = defineStore('Category', {
       // 存储二级分类数据
       c2Arr: [],
       // 存储二级分类ID
-      c2Id: ''
+      c2Id: '',
+      // 存储三级分类数据
+      c3Arr: [],
+      // 存储三级分类ID
+      c3Id: ''
     };
   },
   actions: {
