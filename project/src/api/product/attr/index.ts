@@ -6,15 +6,15 @@ enum API {
   // 获取一级分类接口地址
   C1_URL = '/product/getCategory1',
   // 获取二级分类接口地址
-  C2_URL = '/product/getCategory2',
+  C2_URL = '/product/getCategory2/',
   // 获取三级分类接口地址
-  C3_URL = '/product/getCategory3',
+  C3_URL = '/product/getCategory3/',
 }
 
 // 获取一级分类的接口方法
 export const reqC1 = () => request.get<any, CategoryResponseData>(API.C1_URL);
 // 获取二级分类的接口方法
-export const reqC2 = (category1Id: number) =>
+export const reqC2 = (category1Id: number | string) =>
     request.get<any, CategoryResponseData>(API.C2_URL + category1Id);
 // 获取三级分类的接口方法
 export const reqC3 = (category2Id: number) =>
