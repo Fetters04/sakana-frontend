@@ -25,7 +25,11 @@
             <!--修改已有属性的按钮-->
             <el-button @click="updateAttr(row)" type="success" size="small" icon="Edit"></el-button>
             <!--删除已有属性的按钮-->
-            <el-button type="danger" size="small" icon="Delete"></el-button>
+            <el-popconfirm :title="`您确定删除属性${row.attrName}吗？`" @confirm="deleteAttr(row.id)" width="240px">
+              <template #reference>
+                <el-button type="danger" size="small" icon="Delete"></el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -71,11 +75,11 @@
 
 <script setup lang="ts">
 import useCategoryStore from '@/store/modules/category';
-import { nextTick, onMounted, reactive, ref, watch } from 'vue';
-import { reqAddOrUpdateAttr, reqAttr } from '@/api/product/attr';
+import category from '@/store/modules/category';
+import { nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { reqAddOrUpdateAttr, reqAttr, reqRemoveAttr } from '@/api/product/attr';
 import { Attr, AttrResponseData, AttrValue } from '@/api/product/attr/type';
 import { ElMessage } from 'element-plus';
-import category from '@/store/modules/category';
 
 // 获取分类仓库
 let categoryStore = useCategoryStore();
@@ -92,16 +96,6 @@ let attrParams = reactive<Attr>({
 });
 // 存储属性值el-input实例对象
 let inputArr = ref<any>([]);
-
-onMounted(() => {
-  // 一挂载清空三级分类数据
-  categoryStore.c1Id = '';
-  categoryStore.c1Arr = [];
-  categoryStore.c2Id = '';
-  categoryStore.c2Arr = [];
-  categoryStore.c3Id = '';
-  categoryStore.c3Arr = [];
-});
 
 // 监听仓库三级分类ID变化
 watch(() => categoryStore.c3Id, () => {
@@ -123,6 +117,31 @@ const getAttr = async () => {
   }
 };
 
+// 修改属性按钮回调
+const updateAttr = (row: Attr) => {
+  // 切换场景
+  scene.value = false;
+  // 将已有的属性对象赋值给attrParams对象
+  Object.assign(attrParams, JSON.parse(JSON.stringify(row)));
+};
+// 删除属性按钮回调
+const deleteAttr = async (id: number) => {
+  // 发送删除已有属性请求
+  let result: any = await reqRemoveAttr(id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    });
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除失败'
+    });
+  }
+  // 获取已有的属性与属性值
+  await getAttr();
+};
 // 添加属性按钮回调
 const addAttr = () => {
   // 每次点击先清空数据再收集
@@ -134,13 +153,6 @@ const addAttr = () => {
   });
   // 切换场景
   scene.value = false;
-};
-// 修改属性按钮回调
-const updateAttr = (row: Attr) => {
-  // 切换场景
-  scene.value = false;
-  // 将已有的属性对象赋值给attrParams对象
-  Object.assign(attrParams, JSON.parse(JSON.stringify(row)));
 };
 // 取消按钮回调
 const cancel = () => {
@@ -164,7 +176,7 @@ const save = async () => {
       message: attrParams.id ? '修改失败' : '添加失败'
     });
   }
-  // 获取全部已有的属性与属性值
+  // 获取已有的属性与属性值
   await getAttr();
 };
 // 添加属性值按钮回调
@@ -222,6 +234,12 @@ const toEdit = (row: AttrValue, $index: number) => {
     inputArr.value[$index].focus();
   });
 };
+
+// 组件销毁时清空分类仓库相关数据
+onBeforeUnmount(() => {
+  // 清空仓库数据
+  categoryStore.$reset();
+});
 </script>
 
 <style scoped lang="scss">
