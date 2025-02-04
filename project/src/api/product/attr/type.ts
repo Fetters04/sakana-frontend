@@ -21,16 +21,16 @@ export interface CategoryResponseData extends ResponseData {
 
 // 属性值对象类型
 export interface AttrValue {
-  id: number;
+  id?: number;
   valueName: string;
-  attrId: number;
+  attrId?: number;
 }
 
 // 属性对象
 export interface Attr {
-  id: number;
+  id?: number;
   attrName: string;
-  categoryId: number;
+  categoryId: number | string;
   categoryLevel: number;
   attrValueList: AttrValue[];
 }

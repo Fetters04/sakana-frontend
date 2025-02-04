@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import useCategoryStore from '@/store/modules/category';
-import { ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { reqAttr } from '@/api/product/attr';
 import { Attr, AttrResponseData } from '@/api/product/attr/type';
 
@@ -54,6 +54,13 @@ let categoryStore = useCategoryStore();
 let attrArr = ref<Attr[]>([]);
 // 定义card组件内容切换
 let scene = ref<boolean>(true);
+// 收集新增属性的数据
+let attrParams = reactive<Attr>({
+  attrName: '',
+  attrValueList: [],
+  categoryId: '',
+  categoryLevel: 3
+});
 
 // 监听仓库三级分类ID变化
 watch(() => categoryStore.c3Id, () => {
