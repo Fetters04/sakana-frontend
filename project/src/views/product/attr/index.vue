@@ -2,13 +2,14 @@
   <!--三级分类全局组件-->
   <Category :scene="scene"/>
   <el-card style="margin: 20px 0">
+    <!--展示三级分类数据的结构-->
     <div v-if="scene">
       <el-button @click="addAttr"
                  :disabled="!categoryStore.c3Id"
                  type="primary" size="large" icon="Plus">
         添加属性
       </el-button>
-      <!-- 真实数据表格 -->
+      <!-- 数据表格 -->
       <el-table border style="margin-top: 20px" :data="attrArr">
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
         <el-table-column label="属性名称" align="center" width="200px" prop="attrName"></el-table-column>
@@ -27,8 +28,8 @@
         </el-table-column>
       </el-table>
     </div>
+    <!--展示添加和修改数据的结构-->
     <div v-else>
-      <!--展示添加和修改数据的结构-->
       <el-form inline>
         <el-form-item label="属性名称">
           <el-input placeholder="请输入属性名称" v-model="attrParams.attrName"></el-input>
@@ -44,17 +45,22 @@
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
         <el-table-column label="属性值名称">
           <template #="{row, $index}">
-            <el-input v-if="row.flag" @blur="toLook(row, $index)" placeholder="请输入属性值名称"
+            <el-input :ref="(vc:any)=>inputArr[$index] = vc"
+                      v-if="row.flag" @blur="toLook(row, $index)"
+                      placeholder="请输入属性值名称"
                       v-model="row.valueName"></el-input>
-            <div v-else @click="toEdit(row)">{{ row.valueName }}</div>
+            <div v-else @click="toEdit(row, $index)">{{ row.valueName }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="操作"></el-table-column>
+        <el-table-column label="属性值操作">
+          <template #="{row, $index}">
+            <el-button @click="attrParams.attrValueList.splice($index, 1)"
+                       type="danger" size="small" icon="Delete"></el-button>
+          </template>
+        </el-table-column>
       </el-table>
-      <el-button @click="save"
-                 :disabled="!attrParams.attrValueList.length"
-                 type="primary" size="default">
-        保存
+      <el-button @click="save" :disabled="!attrParams.attrValueList.length"
+                 type="primary" size="default">保存
       </el-button>
       <el-button @click="cancel" size="default">取消</el-button>
     </div>
@@ -63,7 +69,7 @@
 
 <script setup lang="ts">
 import useCategoryStore from '@/store/modules/category';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { reqAddOrUpdateAttr, reqAttr } from '@/api/product/attr';
 import { Attr, AttrResponseData, AttrValue } from '@/api/product/attr/type';
 import { ElMessage } from 'element-plus';
@@ -82,6 +88,8 @@ let attrParams = reactive<Attr>({
   categoryId: '',
   categoryLevel: 3
 });
+// 存储属性值el-input实例对象
+let inputArr = ref<any>([]);
 
 onMounted(() => {
   // 一挂载清空三级分类数据
@@ -163,6 +171,10 @@ const addAttrValue = () => {
     // 控制编辑模式与查看模式的切换
     flag: true
   });
+  // 最后el-input聚焦
+  nextTick(() => {
+    inputArr.value[attrParams.attrValueList.length - 1].focus();
+  });
 };
 
 // 属性值表单元素失去焦点切换为查看模式
@@ -198,9 +210,13 @@ const toLook = (row: AttrValue, $index: number) => {
   row.flag = false;
 };
 // 属性值表单元素点击切换为编辑模式
-const toEdit = (row: AttrValue) => {
+const toEdit = (row: AttrValue, $index: number) => {
   // 模式切换
   row.flag = true;
+  // 对应el-input聚焦
+  nextTick(() => {
+    inputArr.value[$index].focus();
+  });
 };
 </script>
 
