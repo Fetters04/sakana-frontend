@@ -3,7 +3,10 @@
   <Category :scene="scene"/>
   <el-card style="margin: 20px 0">
     <div v-if="scene">
-      <el-button @click="addAttr" :disabled="!categoryStore.c3Id" type="primary" size="large" icon="Plus">添加属性
+      <el-button @click="addAttr"
+                 :disabled="!categoryStore.c3Id"
+                 type="primary" size="large" icon="Plus">
+        添加属性
       </el-button>
       <!-- 真实数据表格 -->
       <el-table border style="margin-top: 20px" :data="attrArr">
@@ -11,7 +14,9 @@
         <el-table-column label="属性名称" align="center" width="200px" prop="attrName"></el-table-column>
         <el-table-column label="属性值名称" align="center">
           <template #="{row, $index}">
-            <el-tag style="margin: 5px" v-for="item in row.attrValueList" :key="item.id">{{ item.valueName }}</el-tag>
+            <el-tag style="margin: 5px" v-for="item in row.attrValueList" :key="item.id">
+              {{ item.valueName }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="200px">
@@ -29,20 +34,28 @@
           <el-input placeholder="请输入属性名称" v-model="attrParams.attrName"></el-input>
         </el-form-item>
       </el-form>
-      <el-button @click="addAttrValue" :disabled="!attrParams.attrName" type="primary" size="default" icon="Plus">
+      <el-button @click="addAttrValue"
+                 :disabled="!attrParams.attrName"
+                 type="primary" size="default" icon="Plus">
         添加属性值
       </el-button>
-      <el-button size="default">取消</el-button>
+      <el-button @click="cancel" size="default">取消</el-button>
       <el-table border style="margin: 20px 0" :data="attrParams.attrValueList">
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
-        <el-table-column label="属性值名称" align="center">
+        <el-table-column label="属性值名称">
           <template #="{row, $index}">
-            <el-input placeholder="请输入属性值名称" v-model="row.valueName"></el-input>
+            <el-input v-if="row.flag" @blur="toLook(row, $index)" placeholder="请输入属性值名称"
+                      v-model="row.valueName"></el-input>
+            <div v-else @click="toEdit(row)">{{ row.valueName }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200px"></el-table-column>
+        <el-table-column label="操作"></el-table-column>
       </el-table>
-      <el-button @click="save" type="primary" size="default">保存</el-button>
+      <el-button @click="save"
+                 :disabled="!attrParams.attrValueList.length"
+                 type="primary" size="default">
+        保存
+      </el-button>
       <el-button @click="cancel" size="default">取消</el-button>
     </div>
   </el-card>
@@ -50,10 +63,11 @@
 
 <script setup lang="ts">
 import useCategoryStore from '@/store/modules/category';
-import { reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { reqAddOrUpdateAttr, reqAttr } from '@/api/product/attr';
-import { Attr, AttrResponseData } from '@/api/product/attr/type';
+import { Attr, AttrResponseData, AttrValue } from '@/api/product/attr/type';
 import { ElMessage } from 'element-plus';
+import category from '@/store/modules/category';
 
 // 获取分类仓库
 let categoryStore = useCategoryStore();
@@ -67,6 +81,16 @@ let attrParams = reactive<Attr>({
   attrValueList: [],
   categoryId: '',
   categoryLevel: 3
+});
+
+onMounted(() => {
+  // 一挂载清空三级分类数据
+  categoryStore.c1Id = '';
+  categoryStore.c1Arr = [];
+  categoryStore.c2Id = '';
+  categoryStore.c2Arr = [];
+  categoryStore.c3Id = '';
+  categoryStore.c3Arr = [];
 });
 
 // 监听仓库三级分类ID变化
@@ -135,8 +159,48 @@ const save = async () => {
 const addAttrValue = () => {
   // 向数组添加一个属性值对象
   attrParams.attrValueList.push({
-    valueName: ''
+    valueName: '',
+    // 控制编辑模式与查看模式的切换
+    flag: true
   });
+};
+
+// 属性值表单元素失去焦点切换为查看模式
+const toLook = (row: AttrValue, $index: number) => {
+  // 空数据判断
+  if (row.valueName.trim() == '') {
+    // 删除空元素
+    attrParams.attrValueList.splice($index, 1);
+    // 提示信息
+    ElMessage({
+      type: 'error',
+      message: '属性值不能为空'
+    });
+    return;
+  }
+  // 重复数据判断
+  let repeat = attrParams.attrValueList.find((item) => {
+    // 判断除自己以外的数据是否存在重复
+    if (item != row) {
+      return item.valueName == row.valueName;
+    }
+  });
+  if (repeat) {
+    // 删除重复元素
+    attrParams.attrValueList.splice($index, 1);
+    // 提示信息
+    ElMessage({
+      type: 'error',
+      message: '属性值不能重复'
+    });
+  }
+  // 模式切换
+  row.flag = false;
+};
+// 属性值表单元素点击切换为编辑模式
+const toEdit = (row: AttrValue) => {
+  // 模式切换
+  row.flag = true;
 };
 </script>
 

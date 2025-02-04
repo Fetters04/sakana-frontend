@@ -33,6 +33,7 @@ export interface Attr {
   categoryId: number | string;
   categoryLevel: number;
   attrValueList: AttrValue[];
+  flag?: boolean;
 }
 
 // 属性接口返回的数据类型
