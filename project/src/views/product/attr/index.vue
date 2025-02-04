@@ -22,7 +22,9 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200px">
           <template #="{row, $index}">
-            <el-button @click="updateAttr" type="success" size="small" icon="Edit"></el-button>
+            <!--修改已有属性的按钮-->
+            <el-button @click="updateAttr(row)" type="success" size="small" icon="Edit"></el-button>
+            <!--删除已有属性的按钮-->
             <el-button type="danger" size="small" icon="Delete"></el-button>
           </template>
         </el-table-column>
@@ -134,9 +136,11 @@ const addAttr = () => {
   scene.value = false;
 };
 // 修改属性按钮回调
-const updateAttr = () => {
+const updateAttr = (row: Attr) => {
   // 切换场景
   scene.value = false;
+  // 将已有的属性对象赋值给attrParams对象
+  Object.assign(attrParams, JSON.parse(JSON.stringify(row)));
 };
 // 取消按钮回调
 const cancel = () => {
