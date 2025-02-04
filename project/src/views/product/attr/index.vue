@@ -3,7 +3,7 @@
   <Category :scene="scene"/>
   <el-card style="margin: 20px 0">
     <div v-if="scene">
-      <el-button type="primary" size="large" icon="Plus" :disabled="!categoryStore.c3Id" @click="addAttr">添加属性
+      <el-button @click="addAttr" :disabled="!categoryStore.c3Id" type="primary" size="large" icon="Plus">添加属性
       </el-button>
       <!-- 真实数据表格 -->
       <el-table border style="margin-top: 20px" :data="attrArr">
@@ -16,7 +16,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200px">
           <template #="{row, $index}">
-            <el-button type="success" size="small" icon="Edit" @click="updateAttr"></el-button>
+            <el-button @click="updateAttr" type="success" size="small" icon="Edit"></el-button>
             <el-button type="danger" size="small" icon="Delete"></el-button>
           </template>
         </el-table-column>
@@ -26,18 +26,24 @@
       <!--展示添加和修改数据的结构-->
       <el-form inline>
         <el-form-item label="属性名称">
-          <el-input placeholder="请输入属性名称"></el-input>
+          <el-input placeholder="请输入属性名称" v-model="attrParams.attrName"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary" size="default" icon="Plus">添加属性值</el-button>
+      <el-button @click="addAttrValue" :disabled="!attrParams.attrName" type="primary" size="default" icon="Plus">
+        添加属性值
+      </el-button>
       <el-button size="default">取消</el-button>
-      <el-table border style="margin: 20px 0">
+      <el-table border style="margin: 20px 0" :data="attrParams.attrValueList">
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
-        <el-table-column label="属性值名称" align="center"></el-table-column>
+        <el-table-column label="属性值名称" align="center">
+          <template #="{row, $index}">
+            <el-input placeholder="请输入属性值名称" v-model="row.valueName"></el-input>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="200px"></el-table-column>
       </el-table>
-      <el-button type="primary" size="default">保存</el-button>
-      <el-button size="default" @click="cancel">取消</el-button>
+      <el-button @click="save" type="primary" size="default">保存</el-button>
+      <el-button @click="cancel" size="default">取消</el-button>
     </div>
   </el-card>
 </template>
@@ -45,8 +51,9 @@
 <script setup lang="ts">
 import useCategoryStore from '@/store/modules/category';
 import { reactive, ref, watch } from 'vue';
-import { reqAttr } from '@/api/product/attr';
+import { reqAddOrUpdateAttr, reqAttr } from '@/api/product/attr';
 import { Attr, AttrResponseData } from '@/api/product/attr/type';
+import { ElMessage } from 'element-plus';
 
 // 获取分类仓库
 let categoryStore = useCategoryStore();
@@ -84,15 +91,52 @@ const getAttr = async () => {
 
 // 添加属性按钮回调
 const addAttr = () => {
+  // 每次点击先清空数据再收集
+  Object.assign(attrParams, {
+    attrName: '',
+    attrValueList: [],
+    categoryId: categoryStore.c3Id,
+    categoryLevel: 3
+  });
+  // 切换场景
   scene.value = false;
 };
 // 修改属性按钮回调
 const updateAttr = () => {
+  // 切换场景
   scene.value = false;
 };
 // 取消按钮回调
 const cancel = () => {
   scene.value = true;
+};
+// 保存按钮回调
+const save = async () => {
+  // 发请求
+  let result: any = await reqAddOrUpdateAttr(attrParams);
+  if (result.code == 200) {
+    // 切换场景
+    scene.value = true;
+    // 提示信息
+    ElMessage({
+      type: 'success',
+      message: attrParams.id ? '修改成功' : '添加成功'
+    });
+  } else {
+    ElMessage({
+      type: 'error',
+      message: attrParams.id ? '修改失败' : '添加失败'
+    });
+  }
+  // 获取全部已有的属性与属性值
+  await getAttr();
+};
+// 添加属性值按钮回调
+const addAttrValue = () => {
+  // 向数组添加一个属性值对象
+  attrParams.attrValueList.push({
+    valueName: ''
+  });
 };
 </script>
 
