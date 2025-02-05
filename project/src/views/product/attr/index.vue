@@ -3,7 +3,7 @@
   <Category :scene="scene"/>
   <el-card style="margin: 20px 0">
     <!--展示三级分类数据的结构-->
-    <div v-if="scene">
+    <div v-if="scene==0">
       <el-button @click="addAttr"
                  :disabled="!categoryStore.c3Id"
                  type="primary" size="large" icon="Plus">
@@ -86,7 +86,7 @@ let categoryStore = useCategoryStore();
 // 存储已有的属性和属性值
 let attrArr = ref<Attr[]>([]);
 // 定义card组件内容切换
-let scene = ref<boolean>(true);
+let scene = ref<number>(0);
 // 收集新增属性的数据
 let attrParams = reactive<Attr>({
   attrName: '',
@@ -120,7 +120,7 @@ const getAttr = async () => {
 // 修改属性按钮回调
 const updateAttr = (row: Attr) => {
   // 切换场景
-  scene.value = false;
+  scene.value = 1;
   // 将已有的属性对象赋值给attrParams对象
   Object.assign(attrParams, JSON.parse(JSON.stringify(row)));
 };
@@ -152,11 +152,11 @@ const addAttr = () => {
     categoryLevel: 3
   });
   // 切换场景
-  scene.value = false;
+  scene.value = 1;
 };
 // 取消按钮回调
 const cancel = () => {
-  scene.value = true;
+  scene.value = 0;
 };
 // 保存按钮回调
 const save = async () => {
@@ -164,7 +164,7 @@ const save = async () => {
   let result: any = await reqAddOrUpdateAttr(attrParams);
   if (result.code == 200) {
     // 切换场景
-    scene.value = true;
+    scene.value = 0;
     // 提示信息
     ElMessage({
       type: 'success',
