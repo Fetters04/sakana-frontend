@@ -13,7 +13,7 @@
         <el-table-column label="SPU操作">
           <template #="{row, $index}">
             <el-button type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
-            <el-button @click="updateSpu" type="warning" size="small" icon="Edit" title="修改SPU"></el-button>
+            <el-button @click="updateSpu(row)" type="warning" size="small" icon="Edit" title="修改SPU"></el-button>
             <el-button type="info" size="small" icon="View" title="查看SKU列表"></el-button>
             <el-button type="danger" size="small" icon="Delete" title="删除SPU"></el-button>
           </template>
@@ -32,7 +32,7 @@
       />
     </div>
     <!-- 添加SPU|修改SPU子组件 -->
-    <SpuForm v-show="scene==1" @changeScene="changeScene"></SpuForm>
+    <SpuForm ref="spuFormVc" v-show="scene==1" @changeScene="changeScene"></SpuForm>
     <!-- 添加SKU子组件 -->
     <SkuForm v-show="scene==2"></SkuForm>
   </el-card>
@@ -42,7 +42,7 @@
 import { onBeforeUnmount, ref, watch } from 'vue';
 import useCategoryStore from '@/store/modules/category';
 import { reqHasSPU } from '@/api/product/spu';
-import { HasSpuResponseData, Records } from '@/api/product/spu/type';
+import { HasSpuResponseData, Records, SpuData } from '@/api/product/spu/type';
 import SpuForm from '@/views/product/spu/spuForm.vue';
 import SkuForm from '@/views/product/spu/skuForm.vue';
 
@@ -58,6 +58,8 @@ let categoryStore = useCategoryStore();
 let records = ref<Records>([]);
 // 存储已有SPU总数
 let total = ref<number>(0);
+// 获取SpuForm组件实例
+let spuFormVc = ref<any>();
 
 // 监听三级分类ID变化
 watch(() => categoryStore.c3Id, () => {
@@ -87,9 +89,11 @@ const addSpu = () => {
   scene.value = 1;
 };
 // 修改SPU按钮回调
-const updateSpu = () => {
+const updateSpu = (row: SpuData) => {
   // 切换为场景1：添加与修改已有SPU结构 -> SpuForm
   scene.value = 1;
+  // 调用子组件实例方法，获取完整已有的SPU数据
+  spuFormVc.value.initHasSpuData(row);
 };
 
 // 子组件SpuForm绑定自定义事件：让子组件通知父组件切换场景0

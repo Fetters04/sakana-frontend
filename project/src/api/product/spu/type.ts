@@ -16,10 +16,13 @@ export interface SpuData {
   spuImageList: null;
 }
 
+// 统一存放SpuData数据
+export type Records = SpuData[];
+
 // 获取已有的SPU接口返回数据的ts类型
 export interface HasSpuResponseData extends ResponseData {
   data: {
-    records: SpuData[];
+    records: Records;
     total: number;
     size: number;
     current: number;
@@ -74,12 +77,12 @@ export interface SaleAttr {
   spuSaleAttrValueList: SaleAttrValue[];
 }
 
-// SPU已有销售属性接口返回数据ts类型
+// 获取某个SPU已有销售属性接口返回数据ts类型
 export interface SaleAttrResponseData extends ResponseData {
   data: SaleAttr[];
 }
 
-// 获取已有的销售属性的ts类型
+// 获取全部已有的销售属性的ts类型
 export interface HasSaleAttr {
   id: number;
   name: string;
