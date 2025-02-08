@@ -1,17 +1,15 @@
 <template>
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
-      <el-input placeholder="请您输入SPU名称"></el-input>
+      <el-input placeholder="请您输入SPU名称" v-model="spuParams.spuName"></el-input>
     </el-form-item>
-    <el-form-item label="SPU名牌">
-      <el-select style="width: 300px">
-        <el-option label="小米"></el-option>
-        <el-option label="华为"></el-option>
-        <el-option label="苹果"></el-option>
+    <el-form-item label="SPU名称">
+      <el-select style="width: 300px" v-model="spuParams.tmId">
+        <el-option v-for="item in allTrademark" :key="item.id" :label="item.tmName" :value="item.id"></el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="SPU描述">
-      <el-input type="textarea" placeholder="请您输入SPU描述"></el-input>
+      <el-input type="textarea" placeholder="请您输入SPU描述" v-model="spuParams.description"></el-input>
     </el-form-item>
     <el-form-item label="SPU照片">
       <el-upload style="width: 178px; height: 178px; border: 1px solid red">
@@ -45,11 +43,15 @@
 
 <script setup lang="ts">
 import {
-  AllTrademark, HasSaleAttr,
-  HasSaleAttrResponseData, SaleAttr,
+  AllTrademark,
+  HasSaleAttr,
+  HasSaleAttrResponseData,
+  SaleAttr,
   SaleAttrResponseData,
   SpuData,
-  SpuHasImg, SpuImage, Trademark
+  SpuHasImg,
+  SpuImage,
+  Trademark
 } from '@/api/product/spu/type';
 import { reqAllSaleAttr, reqAllTrademark, reqSpuHasSaleAttr, reqSpuImageList } from '@/api/product/spu';
 import { ref } from 'vue';
@@ -66,14 +68,24 @@ let allTrademark = ref<Trademark[]>([]);
 let imgList = ref<SpuImage[]>([]);
 let saleAttr = ref<SaleAttr[]>([]);
 let allSaleAttr = ref<HasSaleAttr[]>([]);
+// 收集SPU对象数据
+let spuParams = ref<SpuData>({
+  category3Id: '',
+  spuName: '',
+  description: '',
+  tmId: '',
+  spuImageList: [],
+  spuSaleAttrList: []
+});
 
 // 回显Spu数据+发请求
 const initHasSpuData = async (spu: SpuData) => {
+  // 存储SPU对象，用来在模板展示
+  spuParams.value = spu;
   // 获取全部品牌数据
   let result1: AllTrademark = await reqAllTrademark();
   // 获取某SPU下全部售卖商品图片
   let result2: SpuHasImg = reqSpuImageList(spu.id);
-  console.log(result1);
   // 获取已有的SPU销售属性的数据
   let result3: SaleAttrResponseData = await reqSpuHasSaleAttr(spu.id);
   // 获取全部销售属性数据
