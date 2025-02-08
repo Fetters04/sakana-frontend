@@ -11,12 +11,22 @@
     <el-form-item label="SPU描述">
       <el-input type="textarea" placeholder="请您输入SPU描述" v-model="spuParams.description"></el-input>
     </el-form-item>
-    <el-form-item label="SPU照片">
-      <el-upload style="width: 178px; height: 178px; border: 1px solid red">
-        <el-icon style="width: 178px; height: 178px;">
+    <el-form-item label="SPU图片">
+      <el-upload
+          v-model:file-list="imgList"
+          action="/api/product/fileUpload"
+          list-type="picture-card"
+          :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove"
+          :before-upload="handleUpload"
+      >
+        <el-icon>
           <Plus/>
         </el-icon>
       </el-upload>
+      <el-dialog v-model="dialogVisible" style="width: 500px">
+        <img :src="dialogImageUrl" alt="Preview Image" width="100%"/>
+      </el-dialog>
     </el-form-item>
     <el-form-item label="SPU销售属性">
       <!-- 展示销售属性的下拉菜单 -->
@@ -55,6 +65,7 @@ import {
 } from '@/api/product/spu/type';
 import { reqAllSaleAttr, reqAllTrademark, reqSpuHasSaleAttr, reqSpuImageList } from '@/api/product/spu';
 import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
 
 let $emit = defineEmits(['changeScene']);
 
@@ -77,6 +88,10 @@ let spuParams = ref<SpuData>({
   spuImageList: [],
   spuSaleAttrList: []
 });
+// 控制对话框的显示与隐藏
+let dialogVisible = ref<boolean>(false);
+// 存储预览图片的地址
+let dialogImageUrl = ref<string>('');
 
 // 回显Spu数据+发请求
 const initHasSpuData = async (spu: SpuData) => {
@@ -85,7 +100,7 @@ const initHasSpuData = async (spu: SpuData) => {
   // 获取全部品牌数据
   let result1: AllTrademark = await reqAllTrademark();
   // 获取某SPU下全部售卖商品图片
-  let result2: SpuHasImg = reqSpuImageList(spu.id);
+  let result2: SpuHasImg = await reqSpuImageList(spu.id);
   // 获取已有的SPU销售属性的数据
   let result3: SaleAttrResponseData = await reqSpuHasSaleAttr(spu.id);
   // 获取全部销售属性数据
@@ -94,13 +109,50 @@ const initHasSpuData = async (spu: SpuData) => {
   // 存储全部品牌数据
   allTrademark.value = result1.data;
   // SPU对应的商品图片
-  imgList.value = result2.data;
+  imgList.value = result2.data.map(item => {
+    return {
+      name: item.imgName,
+      url: item.imgUrl
+    };
+  });
   // 存储已有的SPU的销售属性
   saleAttr.value = result3.data;
   // 存储全部销售属性
   allSaleAttr.value = result4.data;
 };
 defineExpose({ initHasSpuData });
+
+// 照片墙点击预览按钮时触发的钩子
+const handlePictureCardPreview = (file: any) => {
+  dialogImageUrl = file.url;
+  // 弹出对话框
+  dialogVisible.value = true;
+};
+// 照片墙删除文件的钩子
+const handleRemove = () => {
+  console.log(123);
+};
+// 照片墙上传成功前的钩子，限制上传图片的类型和大小
+const handleUpload = (file: any) => {
+  // 要求：上传文件格式 jpg|png|gif 4M
+  if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/gif') {
+    if (rawFile.size / 1024 / 1024 < 4) {
+      return true;
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '上传文件大小应小于4M'
+      });
+      return false;
+    }
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '上传文件格式务必为 jpg, png, gif'
+    });
+    return false;
+  }
+};
 </script>
 
 <style scoped lang="scss">
