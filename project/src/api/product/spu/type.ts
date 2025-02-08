@@ -7,13 +7,13 @@ export interface ResponseData {
 
 // SPU数据的ts类型
 export interface SpuData {
+  category3Id: number | string;
   id?: number;
   spuName: string;
+  tmId: number | string;
   description: string;
-  category3Id: number | string;
-  tmId: number;
-  spuSaleAttrList: null;
-  spuImageList: null;
+  spuImageList: null | SpuImage[];
+  spuSaleAttrList: null | SaleAttr[];
 }
 
 // 统一存放SpuData数据
@@ -45,12 +45,12 @@ export interface AllTrademark extends ResponseData {
 
 // 商品图片的ts类型
 export interface SpuImage {
-  id: number;
-  spuId: number;
+  id?: number;
   imgName: string;
   imgUrl: string;
-  createTime: string;
-  updateTime: string;
+  spuId?: number;
+  createTime?: string;
+  updateTime?: string;
 }
 
 // 获取已有SPU照片墙接口返回数据ts类型
@@ -61,17 +61,17 @@ export interface SpuHasImg extends ResponseData {
 // 已有的SPU的销售属性值对象ts类型
 export interface SaleAttrValue {
   id?: number;
-  spuId: number;
+  spuId?: number;
   baseSaleAttrId: number;
   saleAttrValueName: string;
-  saleAttrName: string;
-  isChecked: null;
+  saleAttrName?: string;
+  isChecked?: null;
 }
 
 // 销售属性对象ts类型
 export interface SaleAttr {
   id?: number;
-  spuId: number;
+  spuId?: number;
   baseSaleAttrId: number;
   saleAttrName: string;
   spuSaleAttrValueList: SaleAttrValue[];
