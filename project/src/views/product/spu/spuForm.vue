@@ -45,13 +45,19 @@
         <el-table-column label="属性值">
           <!-- row：为当前SPU已有的销售属性对象 -->
           <template #="{row, $index}">
-            <el-tag v-for="item in row.spuSaleAttrValueList" :key="item.id" style="margin: 0 5px">
+            <el-tag v-for="(item, index) in row.spuSaleAttrValueList"
+                    @close="row.spuSaleAttrValueList.splice(index, 1)"
+                    closable :key="item.id" style="margin: 0 5px">
               {{ item.saleAttrValueName }}
             </el-tag>
-            <el-button type="primary" size="small" icon="Plus"></el-button>
+            <el-input v-if="row.flag" @blur="toLook(row)" v-model="row.saleAttrValue"
+                      placeholder="请输入属性值" size="small" style="width: 120px"></el-input>
+            <el-button v-else @click="toEdit(row)" type="primary" size="small" icon="Plus"
+                       style="margin: 0 5px"></el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="240px">
+          <!-- 删除属性 -->
           <template #="{row, $index}">
             <el-button @click="saleAttr.splice($index, 1)"
                        type="danger" size="small" icon="Delete"></el-button>
@@ -72,7 +78,7 @@ import {
   HasSaleAttr,
   HasSaleAttrResponseData,
   SaleAttr,
-  SaleAttrResponseData,
+  SaleAttrResponseData, SaleAttrValue,
   SpuData,
   SpuHasImg,
   SpuImage,
@@ -158,13 +164,13 @@ const handlePictureCardPreview = (file: any) => {
 };
 // 照片墙删除文件的钩子
 const handleRemove = () => {
-  console.log(123);
+
 };
 // 照片墙上传成功前的钩子，限制上传图片的类型和大小
 const handleUpload = (file: any) => {
   // 要求：上传文件格式 jpg|png|gif 4M
   if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/gif') {
-    if (rawFile.size / 1024 / 1024 < 4) {
+    if (file.size / 1024 / 1024 < 4) {
       return true;
     } else {
       ElMessage({
@@ -196,6 +202,49 @@ const addSaleAttr = () => {
   saleAttr.value.push(newSaleAttr);
   // 清空收集的数据
   saleAttrIdAndValueName.value = '';
+};
+
+// 属性值按钮点击事件
+const toEdit = (row: SaleAttr) => {
+  // 切换为编辑模式
+  row.flag = true;
+  // 收集属性值相关数据，失去焦点时加入到属性的属性值列表中
+  row.saleAttrValue = '';
+};
+// 失去焦点事件
+const toLook = (row: SaleAttr) => {
+  // 收集属性ID和属性值内容
+  const { baseSaleAttrId, saleAttrValue } = row;
+
+  // 非法情况判断
+  if (saleAttrValue.trim() == '') {
+    ElMessage({
+      type: 'error',
+      message: '属性值不能为空'
+    });
+    return;
+  }
+  // 判断该属性值是否已存在
+  let repeat = row.spuSaleAttrValueList.find(item => {
+    return item.saleAttrValueName == saleAttrValue;
+  });
+  if (repeat) {
+    ElMessage({
+      type: 'error',
+      message: '属性值不能重复'
+    });
+    return;
+  }
+
+  // 整理为SaleAttrValue所需格式
+  let newSaleAttrValue: SaleAttrValue = {
+    baseSaleAttrId,
+    saleAttrValueName: saleAttrValue
+  };
+  // 追加新的属性值对象
+  row.spuSaleAttrValueList.push(newSaleAttrValue);
+  // 切换为查看模式
+  row.flag = false;
 };
 </script>
 
