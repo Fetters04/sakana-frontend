@@ -29,9 +29,10 @@
       </el-dialog>
     </el-form-item>
     <el-form-item label="SPU销售属性">
-      <!-- 展示销售属性的下拉菜单 -->
-      <el-select style="width: 300px">
-        <el-option v-for="item in allSaleAttr" :key="item.id" :label="item.name"></el-option>
+      <!-- 展示未拥有销售属性的下拉菜单 -->
+      <el-select style="width: 300px"
+                 :placeholder="unSelectSaleAttr.length?`还未选择${unSelectSaleAttr.length}个`:'无'">
+        <el-option v-for="item in unSelectSaleAttr" :key="item.id" :label="item.name"></el-option>
       </el-select>
       <el-button style="margin-left: 20px" type="primary" size="default" icon="Plus">添加属性值</el-button>
       <!-- 展示销售属性与属性值 -->
@@ -75,7 +76,7 @@ import {
   Trademark
 } from '@/api/product/spu/type';
 import { reqAllSaleAttr, reqAllTrademark, reqSpuHasSaleAttr, reqSpuImageList } from '@/api/product/spu';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
 let $emit = defineEmits(['changeScene']);
@@ -103,6 +104,17 @@ let spuParams = ref<SpuData>({
 let dialogVisible = ref<boolean>(false);
 // 存储预览图片的地址
 let dialogImageUrl = ref<string>('');
+
+// 计算出当前SPU还未拥有的销售属性
+let unSelectSaleAttr = computed(() => {
+  // 从allSaleAttr中过滤出不在saleAttr中的元素
+  let unSelectArr = allSaleAttr.value.filter(item => {
+    return saleAttr.value.every(item1 => {
+      return item.name != item1.saleAttrName;
+    });
+  });
+  return unSelectArr;
+});
 
 // 回显Spu数据+发请求
 const initHasSpuData = async (spu: SpuData) => {
