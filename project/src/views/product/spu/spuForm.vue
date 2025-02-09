@@ -66,7 +66,9 @@
       </el-table>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" size="default">保存</el-button>
+      <el-button :disabled="!saleAttr.length" @click="save"
+                 type="primary" size="default">保存
+      </el-button>
       <el-button @click="cancel" size="default">取消</el-button>
     </el-form-item>
   </el-form>
@@ -84,7 +86,13 @@ import {
   SpuImage,
   Trademark
 } from '@/api/product/spu/type';
-import { reqAllSaleAttr, reqAllTrademark, reqSpuHasSaleAttr, reqSpuImageList } from '@/api/product/spu';
+import {
+  reqAddOrUpdateSpu,
+  reqAllSaleAttr,
+  reqAllTrademark,
+  reqSpuHasSaleAttr,
+  reqSpuImageList
+} from '@/api/product/spu';
 import { computed, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
@@ -245,6 +253,36 @@ const toLook = (row: SaleAttr) => {
   row.spuSaleAttrValueList.push(newSaleAttrValue);
   // 切换为查看模式
   row.flag = false;
+};
+
+// 保存按钮的回调
+const save = async () => {
+  // 整理参数
+  // 1.照片墙数据
+  spuParams.value.spuImageList = imgList.value.map((item: any) => {
+    return {
+      imgName: item.name,
+      imgUrl: (item.response && item.response.data) || item.url
+    };
+  });
+  // 2.销售属性的数据
+  spuParams.value.spuSaleAttrList = saleAttr.value;
+
+  // 向后端发请求
+  let result = await reqAddOrUpdateSpu(spuParams.value);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: spuParams.value.id ? '更新成功' : '添加成功'
+    });
+    // 通知父组件切换场景0
+    $emit('changeScene', 0);
+  } else {
+    ElMessage({
+      type: 'error',
+      message: spuParams.value.id ? '更新失败' : '添加失败'
+    });
+  }
 };
 </script>
 

@@ -100,6 +100,8 @@ const updateSpu = (row: SpuData) => {
 const changeScene = (num: number) => {
   // 子组件SpuForm点击取消切换场景
   scene.value = num;
+  // 再次获取全部的已有SPU
+  getHasSpu();
 };
 
 // 组件销毁时清空分类仓库相关数据
