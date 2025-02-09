@@ -30,11 +30,14 @@
     </el-form-item>
     <el-form-item label="SPU销售属性">
       <!-- 展示未拥有销售属性的下拉菜单 -->
-      <el-select style="width: 300px"
+      <el-select style="width: 300px" v-model="saleAttrIdAndValueName"
                  :placeholder="unSelectSaleAttr.length?`还未选择${unSelectSaleAttr.length}个`:'无'">
-        <el-option v-for="item in unSelectSaleAttr" :key="item.id" :label="item.name"></el-option>
+        <el-option v-for="item in unSelectSaleAttr" :key="item.id" :label="item.name"
+                   :value="`${item.id}:${item.name}`"></el-option>
       </el-select>
-      <el-button style="margin-left: 20px" type="primary" size="default" icon="Plus">添加属性值</el-button>
+      <el-button @click="addSaleAttr" :disabled="!saleAttrIdAndValueName"
+                 style="margin-left: 20px" type="primary" size="default" icon="Plus">添加属性
+      </el-button>
       <!-- 展示销售属性与属性值 -->
       <el-table border style="margin: 20px 0" :data="saleAttr">
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
@@ -104,6 +107,8 @@ let spuParams = ref<SpuData>({
 let dialogVisible = ref<boolean>(false);
 // 存储预览图片的地址
 let dialogImageUrl = ref<string>('');
+// 将来收集还未选择的销售属性的ID与属性值名字
+let saleAttrIdAndValueName = ref<string>('');
 
 // 计算出当前SPU还未拥有的销售属性
 let unSelectSaleAttr = computed(() => {
@@ -175,6 +180,22 @@ const handleUpload = (file: any) => {
     });
     return false;
   }
+};
+
+// 添加销售属性的方法
+const addSaleAttr = () => {
+  // 解构出销售属性所需字段
+  const [baseSaleAttrId, saleAttrName] = saleAttrIdAndValueName.value.split(':');
+  // 构造一个销售属性对象
+  let newSaleAttr: SaleAttr = {
+    baseSaleAttrId,
+    saleAttrName,
+    spuSaleAttrValueList: []
+  };
+  // 追加到数组中
+  saleAttr.value.push(newSaleAttr);
+  // 清空收集的数据
+  saleAttrIdAndValueName.value = '';
 };
 </script>
 
