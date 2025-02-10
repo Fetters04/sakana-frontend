@@ -87,6 +87,8 @@ const getHasSpu = async (pager = 1) => {
 const addSpu = () => {
   // 切换为场景1：添加与修改已有SPU结构 -> SpuForm
   scene.value = 1;
+  // 调用子组件实例方法，初始化数据
+  spuFormVc.value.initAddSpu(categoryStore.c3Id);
 };
 // 修改SPU按钮回调
 const updateSpu = (row: SpuData) => {
@@ -97,11 +99,18 @@ const updateSpu = (row: SpuData) => {
 };
 
 // 子组件SpuForm绑定自定义事件：让子组件通知父组件切换场景0
-const changeScene = (num: number) => {
-  // 子组件SpuForm点击取消切换场景
-  scene.value = num;
-  // 再次获取全部的已有SPU
-  getHasSpu();
+const changeScene = (obj: any) => {
+  // 子组件SpuForm通知父组件切换场景
+  scene.value = obj.flag;
+  // 再次获取数据
+  if (obj.params == 'update') {
+    // 更新留在当前页
+    getHasSpu(pageNo.value);
+  } else {
+    // 添加留在第一页
+    getHasSpu();
+  }
+
 };
 
 // 组件销毁时清空分类仓库相关数据

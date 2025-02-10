@@ -1,9 +1,9 @@
 <template>
-  <el-form label-width="100px">
-    <el-form-item label="SPU名称">
+  <el-form label-width="100px" :model="spuParams" :rules="rules">
+    <el-form-item label="SPU名称" prop="spuName">
       <el-input placeholder="请您输入SPU名称" v-model="spuParams.spuName"></el-input>
     </el-form-item>
-    <el-form-item label="SPU名称">
+    <el-form-item label="SPU品牌" prop="tmId">
       <el-select style="width: 300px" v-model="spuParams.tmId">
         <el-option v-for="item in allTrademark" :key="item.id" :label="item.tmName" :value="item.id"></el-option>
       </el-select>
@@ -100,7 +100,9 @@ let $emit = defineEmits(['changeScene']);
 
 // 通知父组件切换场景0
 const cancel = () => {
-  $emit('changeScene', 0);
+  $emit('changeScene', { flag: 0, params: 'update' });
+  // 清空数据
+  saleAttrIdAndValueName.value = '';
 };
 
 // 存储SPU相关数据
@@ -110,6 +112,7 @@ let saleAttr = ref<SaleAttr[]>([]);
 let allSaleAttr = ref<HasSaleAttr[]>([]);
 // 收集SPU对象数据
 let spuParams = ref<SpuData>({
+  id: '',
   category3Id: '',
   spuName: '',
   description: '',
@@ -162,7 +165,6 @@ const initHasSpuData = async (spu: SpuData) => {
   // 存储全部销售属性
   allSaleAttr.value = result4.data;
 };
-defineExpose({ initHasSpuData });
 
 // 照片墙点击预览按钮时触发的钩子
 const handlePictureCardPreview = (file: any) => {
@@ -275,8 +277,8 @@ const save = async () => {
       type: 'success',
       message: spuParams.value.id ? '更新成功' : '添加成功'
     });
-    // 通知父组件切换场景0
-    $emit('changeScene', 0);
+    // 通知父组件切换场景0及当前操作
+    $emit('changeScene', { flag: 0, params: spuParams.value.id ? 'update' : 'add' });
   } else {
     ElMessage({
       type: 'error',
@@ -284,6 +286,47 @@ const save = async () => {
     });
   }
 };
+
+// 添加SPU时的初始化请求方法
+const initAddSpu = async (c3Id: number | string) => {
+  // 清空数据
+  Object.assign(spuParams.value, {
+    id: '',
+    category3Id: '',
+    spuName: '',
+    description: '',
+    tmId: '',
+    spuImageList: [],
+    spuSaleAttrList: []
+  });
+  imgList.value = [];
+  saleAttr.value = [];
+  saleAttrIdAndValueName.value = '';
+  // 存储三级分类ID
+  spuParams.value.category3Id = c3Id;
+  // 获取全部品牌数据
+  let result1: AllTrademark = await reqAllTrademark();
+  // 获取全部销售属性数据
+  let result2: HasSaleAttrResponseData = await reqAllSaleAttr();
+
+  // 存储全部品牌数据
+  allTrademark.value = result1.data;
+  // 存储全部销售属性
+  allSaleAttr.value = result2.data;
+};
+
+// 表单校验规则对象
+const rules = {
+  spuName: [
+    { required: true }
+  ],
+  tmId: [
+    { required: true }
+  ]
+};
+
+// 对外暴露
+defineExpose({ initHasSpuData, initAddSpu });
 </script>
 
 <style scoped lang="scss">
