@@ -34,7 +34,7 @@
     <!-- 添加SPU|修改SPU子组件 -->
     <SpuForm ref="spuFormVc" v-show="scene==1" @changeScene="changeScene"></SpuForm>
     <!-- 添加SKU子组件 -->
-    <SkuForm v-show="scene==2" @changeScene="changeScene"></SkuForm>
+    <SkuForm ref="skuFormVc" v-show="scene==2" @changeScene="changeScene"></SkuForm>
   </el-card>
 </template>
 
@@ -60,6 +60,8 @@ let records = ref<Records>([]);
 let total = ref<number>(0);
 // 获取SpuForm组件实例
 let spuFormVc = ref<any>();
+// 获取SkuForm组件实例
+let skuFormVc = ref<any>();
 
 // 监听三级分类ID变化
 watch(() => categoryStore.c3Id, () => {
@@ -87,7 +89,7 @@ const getHasSpu = async (pager = 1) => {
 const addSpu = () => {
   // 切换为场景1：添加与修改已有SPU结构 -> SpuForm
   scene.value = 1;
-  // 调用子组件实例方法，初始化数据
+  // 调用子组件实例方法，初始化添加SPU的数据
   spuFormVc.value.initAddSpu(categoryStore.c3Id);
 };
 // 修改SPU按钮回调
@@ -112,10 +114,12 @@ const changeScene = (obj: any) => {
   }
 };
 
-//添加SKU按钮的回调
-const addSku = () => {
+// 添加SKU按钮的回调
+const addSku = (row: SpuData) => {
   // 切换场景2：添加SKU结构 -> SkuForm
   scene.value = 2;
+  // 调用子组件实例方法，初始化添加SKU的数据
+  skuFormVc.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row);
 };
 
 // 组件销毁时清空分类仓库相关数据
