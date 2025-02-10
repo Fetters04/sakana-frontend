@@ -12,7 +12,7 @@
         <el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
         <el-table-column label="SPU操作">
           <template #="{row, $index}">
-            <el-button type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
+            <el-button @click="addSku(row)" type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
             <el-button @click="updateSpu(row)" type="warning" size="small" icon="Edit" title="修改SPU"></el-button>
             <el-button type="info" size="small" icon="View" title="查看SKU列表"></el-button>
             <el-button type="danger" size="small" icon="Delete" title="删除SPU"></el-button>
@@ -34,7 +34,7 @@
     <!-- 添加SPU|修改SPU子组件 -->
     <SpuForm ref="spuFormVc" v-show="scene==1" @changeScene="changeScene"></SpuForm>
     <!-- 添加SKU子组件 -->
-    <SkuForm v-show="scene==2"></SkuForm>
+    <SkuForm v-show="scene==2" @changeScene="changeScene"></SkuForm>
   </el-card>
 </template>
 
@@ -47,7 +47,7 @@ import SpuForm from '@/views/product/spu/spuForm.vue';
 import SkuForm from '@/views/product/spu/skuForm.vue';
 
 // 场景切换
-let scene = ref<number>(0);   // 0：显示已有SPU  1：添加或修改已有SPU  2：添加SKU的结构
+let scene = ref<number>(0);   // 0：显示已有SPU  1：添加或修改已有SPU的结构  2：添加SKU的结构
 // 分页器默认页码
 let pageNo = ref<number>(1);
 // 每一页展示数据量
@@ -98,7 +98,7 @@ const updateSpu = (row: SpuData) => {
   spuFormVc.value.initHasSpuData(row);
 };
 
-// 子组件SpuForm绑定自定义事件：让子组件通知父组件切换场景0
+// 子组件触发自定义事件的回调
 const changeScene = (obj: any) => {
   // 子组件SpuForm通知父组件切换场景
   scene.value = obj.flag;
@@ -106,11 +106,16 @@ const changeScene = (obj: any) => {
   if (obj.params == 'update') {
     // 更新留在当前页
     getHasSpu(pageNo.value);
-  } else {
+  } else if (obj.params == 'add') {
     // 添加留在第一页
     getHasSpu();
   }
+};
 
+//添加SKU按钮的回调
+const addSku = () => {
+  // 切换场景2：添加SKU结构 -> SkuForm
+  scene.value = 2;
 };
 
 // 组件销毁时清空分类仓库相关数据
