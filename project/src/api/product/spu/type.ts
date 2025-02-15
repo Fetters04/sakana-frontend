@@ -94,3 +94,36 @@ export interface HasSaleAttr {
 export interface HasSaleAttrResponseData extends ResponseData {
   data: HasSaleAttr[];
 }
+
+// SKU参数平台属性的类型
+export interface AttrParams {
+  // 平台属性的ID
+  attrId: number | string;
+  // 属性值的ID
+  valueId: number | string;
+}
+
+// SKU参数销售属性的类型
+export interface SaleAttrParams {
+  // 平台属性的ID
+  saleAttrId: number | string;
+  // 属性值的ID
+  saleAttrValueId: number | string;
+}
+
+// SKU的数据类型
+export interface SkuData {
+  category3Id: number | string;
+  spuId: number | string;
+  tmId: number | string;
+  skuName: string;
+  price: number | string;
+  weight: number | string;
+  skuDesc: string;
+  // 平台属性
+  skuAttrValueList?: AttrParams[];
+  // 销售属性
+  skuSaleAttrValueList?: SaleAttrParams[];
+  // sku默认图片地址
+  skuDefaultImg: string;
+}
