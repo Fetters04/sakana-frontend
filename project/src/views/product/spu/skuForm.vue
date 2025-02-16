@@ -53,7 +53,7 @@
       </el-table>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" size="default">保存
+      <el-button @click="save" type="primary" size="default">保存
       </el-button>
       <el-button @click="cancel" size="default">取消</el-button>
     </el-form-item>
@@ -63,9 +63,10 @@
 <script setup lang="ts">
 import { SaleAttr, SaleAttrResponseData, SkuData, SpuData, SpuHasImg, SpuImage } from '@/api/product/spu/type';
 import { reqAttr } from '@/api/product/attr';
-import { reqSpuHasSaleAttr, reqSpuImageList } from '@/api/product/spu';
+import { reqAddSku, reqSpuHasSaleAttr, reqSpuImageList } from '@/api/product/spu';
 import { reactive, ref } from 'vue';
 import { Attr, AttrResponseData } from '@/api/product/attr/type';
+import { ElMessage } from 'element-plus';
 
 let $emit = defineEmits(['changeScene']);
 // 平台属性
@@ -131,6 +132,41 @@ const handlerDefault = (row: SpuImage) => {
   tableVc.value.toggleRowSelection(row, true);
   // 收集默认图片地址
   skuParams.skuDefaultImg = row.imgUrl;
+};
+
+// 保存按钮的回调
+const save = async () => {
+  // 整理平台属性参数
+  skuParams.skuAttrValueList = attrArr.value.reduce((prev: any, next: any) => {
+    if (next.attrIdAndValueId) {
+      let [attrId, valueId] = next.attrIdAndValueId.split(':');
+      prev.push({ attrId, valueId });
+    }
+    return prev;
+  }, []);
+  // 整理销售属性参数
+  skuParams.skuSaleAttrValueList = saleAttrArr.value.reduce((prev: any, next: any) => {
+    if (next.saleIdAndValueId) {
+      let [saleAttrId, saleAttrValueId] = next.saleIdAndValueId.split(':');
+      prev.push({ saleAttrId, saleAttrValueId });
+    }
+    return prev;
+  }, []);
+  // 发送添加SKU的请求
+  let result: any = await reqAddSku(skuParams);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '添加SKU成功'
+    });
+    // 通知父组件切换场景0
+    $emit('changeScene', { flag: 0, params: '' });
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '添加SKU失败'
+    });
+  }
 };
 
 defineExpose({ initSkuData });
