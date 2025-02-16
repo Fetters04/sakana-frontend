@@ -15,7 +15,11 @@
             <el-button @click="addSku(row)" type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
             <el-button @click="updateSpu(row)" type="warning" size="small" icon="Edit" title="修改SPU"></el-button>
             <el-button @click="findSku(row)" type="info" size="small" icon="View" title="查看SKU列表"></el-button>
-            <el-button type="danger" size="small" icon="Delete" title="删除SPU"></el-button>
+            <el-popconfirm :title="`您确定删除${row.spuName}吗？`" width="240px" @confirm="deleteSpu(row)">
+              <template #reference>
+                <el-button type="danger" size="small" icon="Delete" title="删除SPU"></el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -54,10 +58,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, watch } from 'vue';
 import useCategoryStore from '@/store/modules/category';
-import { reqHasSPU, reqSkuList } from '@/api/product/spu';
+import { reqHasSPU, reqRemoveSpu, reqSkuList } from '@/api/product/spu';
 import { HasSpuResponseData, Records, SkuData, SkuInfoResponseData, SpuData } from '@/api/product/spu/type';
 import SpuForm from '@/views/product/spu/spuForm.vue';
 import SkuForm from '@/views/product/spu/skuForm.vue';
+import { ElMessage } from 'element-plus';
 
 // 场景切换
 let scene = ref<number>(0);   // 0：显示已有SPU  1：添加或修改已有SPU的结构  2：添加SKU的结构
@@ -150,7 +155,25 @@ const findSku = async (row: SpuData) => {
   }
 };
 
-// 组件销毁时清空分类仓库相关数据
+// 删除已有SPU按钮的回调
+const deleteSpu = async (row: SpuData) => {
+  let result: any = await reqRemoveSpu(row.id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    });
+    // 获取剩余SPU数据
+    await getHasSpu(records.value.length > 1 ? pageNo.value : pageNo.value - 1);
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除失败'
+    });
+  }
+};
+
+// 组件销毁前，清空分类仓库相关数据
 onBeforeUnmount(() => {
   // 清空仓库数据
   categoryStore.$reset();
