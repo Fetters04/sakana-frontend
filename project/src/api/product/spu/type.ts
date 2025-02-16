@@ -127,3 +127,8 @@ export interface SkuData {
   // sku默认图片地址
   skuDefaultImg: string;
 }
+
+// 获取SPU下的全部SKU数据接口的数据类型
+export interface SkuInfoResponseData extends ResponseData {
+  data: SkuData[];
+}
