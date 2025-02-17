@@ -1,11 +1,33 @@
 <template>
-  <div>
-    <h1>SKU管理</h1>
-  </div>
+  <el-table border style="margin: 20px 0">
+    <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
+    <el-table-column label="名称" show-overflow-tooltip>
+    </el-table-column>
+    <el-table-column label="描述" show-overflow-tooltip></el-table-column>
+    <el-table-column label="默认图片"></el-table-column>
+    <el-table-column label="重量(g)"></el-table-column>
+    <el-table-column label="价格(元)"></el-table-column>
+    <el-table-column label="操作" fixed="right"></el-table-column>
+  </el-table>
+  <el-pagination
+      v-model:current-page="pageNo"
+      v-model:page-size="pageSize"
+      :page-sizes="[10, 20, 30, 40]"
+      :background="true"
+      layout="prev, pager, next, jumper, ->, sizes, total"
+      :total="400"
+      @current-change=""
+      @size-change=""
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 
+// 分页器当前页码
+let pageNo = ref<number>(1);
+// 每页展示数据量
+let pageSize = ref<number>(10);
 </script>
 
 <style scoped lang="scss">
