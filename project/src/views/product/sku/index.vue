@@ -15,7 +15,7 @@
         <el-button @click="updateSale(row)" :type="row.isSale==1?'success':'primary'" size="small"
                    :icon="row.isSale==1?'Bottom':'Top'" :title="row.isSale==1?'下架':'上架'"></el-button>
         <el-button type="warning" size="small" icon="Edit" title="修改SKU"></el-button>
-        <el-button type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
+        <el-button @click="findSku" type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
         <el-button type="danger" size="small" icon="Delete" title="删除SKU"></el-button>
       </template>
     </el-table-column>
@@ -30,6 +30,50 @@
       @current-change="getHasSku"
       @size-change="getHasSku(1)"
   />
+  <!-- SKU详情抽屉组件 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4 style="font-size: 20px;">查看商品详情</h4>
+    </template>
+    <template #default>
+      <div>
+        <el-row class="skuInfo">
+          <el-col :span="6">名称</el-col>
+          <el-col :span="18">苹果</el-col>
+        </el-row>
+        <el-row class="skuInfo">
+          <el-col :span="6">描述</el-col>
+          <el-col :span="18">iPhone手机</el-col>
+        </el-row>
+        <el-row class="skuInfo">
+          <el-col :span="6">价格</el-col>
+          <el-col :span="18">4999</el-col>
+        </el-row>
+        <el-row class="skuInfo">
+          <el-col :span="6">平台属性</el-col>
+          <el-col :span="18">
+            <el-tag v-for="item in 10" type="primary" style="margin: 5px 5px">{{ item }}</el-tag>
+          </el-col>
+        </el-row>
+        <el-row class="skuInfo">
+          <el-col :span="6">销售属性</el-col>
+          <el-col :span="18">
+            <el-tag v-for="item in 10" type="success" style="margin: 5px 5px">{{ item }}</el-tag>
+          </el-col>
+        </el-row>
+        <el-row class="skuInfo">
+          <el-col :span="6">商品图片</el-col>
+          <el-col :span="18">
+            <el-carousel :interval="4000" type="card" height="200px" indicator-position="outside">
+              <el-carousel-item v-for="item in 6" :key="item">
+                <h3>{{ item }}</h3>
+              </el-carousel-item>
+            </el-carousel>
+          </el-col>
+        </el-row>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -46,6 +90,8 @@ let pageSize = ref<number>(10);
 let total = ref<number>(0);
 // 存储已有的SKU数据
 let skuArr = ref<SkuData[]>([]);
+// 控制抽屉显示与隐藏
+let drawer = ref<boolean>(false);
 
 // 组件一挂载就请求分页数据展示
 onMounted(() => {
@@ -87,8 +133,33 @@ const updateSale = async (row: SkuData) => {
   }
   await getHasSku(pageNo.value);
 };
+
+// 查看SKU详情的回调
+const findSku = () => {
+  // 显示抽屉
+  drawer.value = true;
+};
+
 </script>
 
 <style scoped lang="scss">
+.skuInfo {
+  margin: 20px 0;
+}
 
+.el-carousel__item h3 {
+  color: #475669;
+  opacity: 0.75;
+  line-height: 200px;
+  margin: 0;
+  text-align: center;
+}
+
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+
+.el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
+}
 </style>
