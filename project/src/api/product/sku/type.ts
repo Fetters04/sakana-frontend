@@ -23,6 +23,7 @@ export interface SaleAttrParams {
 
 // SKU的数据类型
 export interface SkuData {
+  id?: number;
   category3Id: number | string;
   spuId: number | string;
   tmId: number | string;
@@ -36,6 +37,8 @@ export interface SkuData {
   skuSaleAttrValueList?: SaleAttrParams[];
   // sku默认图片地址
   skuDefaultImg: string;
+  // 控制商品上架与下架
+  isSale?: number;
 }
 
 // 获取SKU分页数据接口返回数据ts类型
