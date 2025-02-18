@@ -7,18 +7,28 @@ export interface ResponseData {
 
 // SKU平台属性的类型
 export interface AttrParams {
+  id?: number;
   // 平台属性的ID
   attrId: number | string;
   // 属性值的ID
   valueId: number | string;
+  // 平台属性名称
+  attrName?: string;
+  // 属性值名称
+  attrValueName?: string;
 }
 
 // SKU销售属性的类型
 export interface SaleAttrParams {
-  // 平台属性的ID
+  id?: number;
+  // 销售属性的ID
   saleAttrId: number | string;
-  // 属性值的ID
+  // 销售属性值的ID
   saleAttrValueId: number | string;
+  // 销售属性名称
+  saleAttrName?: string;
+  // 销售属性值名称
+  saleAttrValueName?: string;
 }
 
 // SKU的数据类型
@@ -33,8 +43,10 @@ export interface SkuData {
   skuDesc: string;
   // 平台属性
   skuAttrValueList?: AttrParams[];
+  skuInfoAttrValueVO?: AttrParams[];
   // 销售属性
   skuSaleAttrValueList?: SaleAttrParams[];
+  skuInfoSaleAttrValueVO?: SaleAttrParams[];
   // sku默认图片地址
   skuDefaultImg: string;
   // 控制商品上架与下架
@@ -51,4 +63,9 @@ export interface HasSkuResponseData extends ResponseData {
     pages: number;
     searchCount: boolean;
   };
+}
+
+// 获取SKU详情接口返回数据ts类型
+export interface SkuInfoResponseData extends ResponseData {
+  data: SkuData;
 }

@@ -15,7 +15,7 @@
         <el-button @click="updateSale(row)" :type="row.isSale==1?'success':'primary'" size="small"
                    :icon="row.isSale==1?'Bottom':'Top'" :title="row.isSale==1?'下架':'上架'"></el-button>
         <el-button type="warning" size="small" icon="Edit" title="修改SKU"></el-button>
-        <el-button @click="findSku" type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
+        <el-button @click="findSku(row)" type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
         <el-button type="danger" size="small" icon="Delete" title="删除SKU"></el-button>
       </template>
     </el-table-column>
@@ -39,26 +39,28 @@
       <div>
         <el-row class="skuInfo">
           <el-col :span="6">名称</el-col>
-          <el-col :span="18">苹果</el-col>
+          <el-col :span="18">{{ skuInfo.skuName }}</el-col>
         </el-row>
         <el-row class="skuInfo">
           <el-col :span="6">描述</el-col>
-          <el-col :span="18">iPhone手机</el-col>
+          <el-col :span="18">{{ skuInfo.skuDesc }}</el-col>
         </el-row>
         <el-row class="skuInfo">
           <el-col :span="6">价格</el-col>
-          <el-col :span="18">4999</el-col>
+          <el-col :span="18">{{ skuInfo.price }}</el-col>
         </el-row>
         <el-row class="skuInfo">
           <el-col :span="6">平台属性</el-col>
           <el-col :span="18">
-            <el-tag v-for="item in 10" type="primary" style="margin: 5px 5px">{{ item }}</el-tag>
+            <el-tag v-for="item in skuInfo.skuInfoAttrValueVO" :key="item.id"
+                    type="primary" style="margin: 5px 5px">{{ item.attrValueName }}</el-tag>
           </el-col>
         </el-row>
         <el-row class="skuInfo">
           <el-col :span="6">销售属性</el-col>
           <el-col :span="18">
-            <el-tag v-for="item in 10" type="success" style="margin: 5px 5px">{{ item }}</el-tag>
+            <el-tag v-for="item in skuInfo.skuInfoSaleAttrValueVO" :key="item.id"
+                    type="success" style="margin: 5px 5px">{{ item.saleAttrValueName }}</el-tag>
           </el-col>
         </el-row>
         <el-row class="skuInfo">
@@ -78,8 +80,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { reqCancelSaleSku, reqHasSku, reqSaleSku } from '@/api/product/sku';
-import { SkuData } from '@/api/product/sku/type';
+import { reqCancelSaleSku, reqHasSku, reqSaleSku, reqSkuInfo } from '@/api/product/sku';
+import { SkuData, SkuInfoResponseData } from '@/api/product/sku/type';
 import { ElMessage } from 'element-plus';
 
 // 分页器当前页码
@@ -92,6 +94,8 @@ let total = ref<number>(0);
 let skuArr = ref<SkuData[]>([]);
 // 控制抽屉显示与隐藏
 let drawer = ref<boolean>(false);
+// 存储SKU详情信息
+let skuInfo = ref<SkuData>({});
 
 // 组件一挂载就请求分页数据展示
 onMounted(() => {
@@ -135,9 +139,15 @@ const updateSale = async (row: SkuData) => {
 };
 
 // 查看SKU详情的回调
-const findSku = () => {
+const findSku = async (row: SkuData) => {
   // 显示抽屉
   drawer.value = true;
+  // 发送请求获取SKU详情
+  let result: SkuInfoResponseData = await reqSkuInfo(row.id);
+  console.log(result);
+  if (result.code == 200) {
+    skuInfo.value = result.data;
+  }
 };
 
 </script>
