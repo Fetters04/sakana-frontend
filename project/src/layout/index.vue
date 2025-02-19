@@ -1,7 +1,7 @@
 <template>
   <div class="layout_container">
     <!--左侧菜单-->
-    <div class="layout_slider">
+    <div class="layout_slider" :class="{fold: layoutSettingStore.fold}">
       <!--logo组件-->
       <Logo></Logo>
       <!--展示菜单-->
@@ -75,6 +75,10 @@ export default {
       .el-menu {
         border-right: none;
       }
+    }
+
+    &.fold {
+      width: $base-menu-min-width;
     }
   }
 
