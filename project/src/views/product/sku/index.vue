@@ -16,7 +16,11 @@
                    :icon="row.isSale==1?'Bottom':'Top'" :title="row.isSale==1?'下架':'上架'"></el-button>
         <el-button type="warning" size="small" icon="Edit" title="修改SKU"></el-button>
         <el-button @click="findSku(row)" type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
-        <el-button type="danger" size="small" icon="Delete" title="删除SKU"></el-button>
+        <el-popconfirm :title="`您确定删除${row.skuName}吗？`" width="240px" @confirm="deleteSku(row)">
+          <template #reference>
+            <el-button type="danger" size="small" icon="Delete" title="删除SKU"></el-button>
+          </template>
+        </el-popconfirm>
       </template>
     </el-table-column>
   </el-table>
@@ -53,14 +57,16 @@
           <el-col :span="6">平台属性</el-col>
           <el-col :span="18">
             <el-tag v-for="item in skuInfo.skuInfoAttrValueVO" :key="item.id"
-                    type="primary" style="margin: 5px 5px">{{ item.attrValueName }}</el-tag>
+                    type="primary" style="margin: 5px 5px">{{ item.attrValueName }}
+            </el-tag>
           </el-col>
         </el-row>
         <el-row class="skuInfo">
           <el-col :span="6">销售属性</el-col>
           <el-col :span="18">
             <el-tag v-for="item in skuInfo.skuInfoSaleAttrValueVO" :key="item.id"
-                    type="success" style="margin: 5px 5px">{{ item.saleAttrValueName }}</el-tag>
+                    type="success" style="margin: 5px 5px">{{ item.saleAttrValueName }}
+            </el-tag>
           </el-col>
         </el-row>
         <el-row class="skuInfo">
@@ -80,7 +86,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { reqCancelSaleSku, reqHasSku, reqSaleSku, reqSkuInfo } from '@/api/product/sku';
+import { reqCancelSaleSku, reqHasSku, reqRemoveSKu, reqSaleSku, reqSkuInfo } from '@/api/product/sku';
 import { SkuData, SkuInfoResponseData } from '@/api/product/sku/type';
 import { ElMessage } from 'element-plus';
 
@@ -90,7 +96,7 @@ let pageNo = ref<number>(1);
 let pageSize = ref<number>(10);
 // 存储已有SKU总数
 let total = ref<number>(0);
-// 存储已有的SKU数据
+// 存储已有的SKU分页数据
 let skuArr = ref<SkuData[]>([]);
 // 控制抽屉显示与隐藏
 let drawer = ref<boolean>(false);
@@ -147,6 +153,25 @@ const findSku = async (row: SkuData) => {
   console.log(result);
   if (result.code == 200) {
     skuInfo.value = result.data;
+  }
+};
+
+// 删除SKU按钮的回调
+const deleteSku = async (row: SkuData) => {
+  // 发请求删除SKU
+  let result: any = await reqRemoveSKu(row.id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    });
+    // 获取剩余数据
+    await getHasSku(skuArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除失败'
+    });
   }
 };
 

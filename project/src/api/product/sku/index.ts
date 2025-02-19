@@ -11,6 +11,8 @@ enum API {
   CANCEL_SALE_URL = '/product/cancelSale/',
   // 获取SKU详情
   SKU_INFO_URL = '/product/getSkuInfo/',
+  // 删除已有商品
+  DELETE_SKU_URL = '/product/deleteSku/',
 }
 
 // 获取SKU分页数据的接口
@@ -23,3 +25,5 @@ export const reqCancelSaleSku = (skuId: number) => request.get<any, any>(API.CAN
 // 获取SKU详情接口
 export const reqSkuInfo = (skuId: number) =>
     request.get<any, SkuInfoResponseData>(API.SKU_INFO_URL + skuId);
+// 删除SKU的接口
+export const reqRemoveSKu = (skuId: number) => request.delete<any, any>(API.DELETE_SKU_URL + skuId);
