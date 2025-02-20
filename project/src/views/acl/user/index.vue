@@ -51,14 +51,14 @@
       <h4 style="font-size: 20px">添加用户</h4>
     </template>
     <template #default>
-      <el-form label-width="80px">
-        <el-form-item label="用户名">
+      <el-form label-width="80px" :model="userParams" :rules="rules" ref="formRef">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="userParams.username" style="width: 300px" placeholder="请输入用户名"></el-input>
         </el-form-item>
-        <el-form-item label="昵称">
+        <el-form-item label="昵称" prop="nickname">
           <el-input v-model="userParams.nickname" style="width: 300px" placeholder="请输入昵称"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input v-model="userParams.password" style="width: 300px" placeholder="请输入密码"></el-input>
         </el-form-item>
       </el-form>
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, reactive, ref } from 'vue';
 import { HasUserResponseData, UserInfo } from '@/api/acl/user/type';
 import { reqAddOrUpdateUser, reqUserInfo } from '@/api/acl/user';
 import { ElMessage } from 'element-plus';
@@ -94,6 +94,8 @@ let userParams = reactive<UserInfo>({
   nickname: '',
   password: ''
 });
+// 获取Form组件实例
+let formRef = ref<any>();
 
 onMounted(() => {
   // 获取用户分页数据
@@ -122,6 +124,12 @@ const addUser = () => {
     nickname: '',
     password: ''
   });
+  // 清除上一次校验提示信息
+  nextTick(() => {
+    formRef.value.clearValidate('username');
+    formRef.value.clearValidate('nickname');
+    formRef.value.clearValidate('password');
+  });
 };
 
 // 编辑按钮的回调
@@ -130,10 +138,18 @@ const updateUser = (row: UserInfo) => {
   drawer.value = true;
   // 用户数据回显
   Object.assign(userParams, row);
+  // 清除上一次校验提示信息
+  nextTick(() => {
+    formRef.value.clearValidate('username');
+    formRef.value.clearValidate('nickname');
+    formRef.value.clearValidate('password');
+  });
 };
 
 // 保存按钮的回调
 const save = async () => {
+  // 保证字段校验通过才能发请求
+  await formRef.value.validate();
   // 发请求添加|修改用户信息
   let result: any = await reqAddOrUpdateUser(userParams);
   if (result.code == 200) {
@@ -157,6 +173,61 @@ const save = async () => {
 const cancel = () => {
   // 关闭抽屉
   drawer.value = false;
+};
+
+// 校验用户名的回调函数
+const validatorUsername = (rule, value, callBack) => {
+  // 定义正则表达式，用于匹配仅包含英文和数字的字符串
+  const reg = /^[a-zA-Z0-9]+$/;
+
+  // 去除字符串首尾空格
+  const trimmedValue = value.trim();
+
+  if (trimmedValue.length >= 5) {
+    if (reg.test(trimmedValue)) {
+      // 长度至少5位且仅由英文和数字组成，校验通过
+      callBack();
+    } else {
+      // 不符合仅由英文和数字组成的规则
+      callBack(new Error('用户名只能由英文和数字组成'));
+    }
+  } else {
+    // 长度不足5位
+    callBack(new Error('用户名至少5位'));
+  }
+};
+
+// 校验昵称的回调函数
+const validatorNickname = (rule: any, value: any, callBack: any) => {
+  // 长度至少5位
+  if (value.trim().length >= 2) {
+    callBack();
+  } else {
+    callBack(new Error('昵称至少2位'));
+  }
+};
+
+// 校验昵称的回调函数
+const validatorPassword = (rule: any, value: any, callBack: any) => {
+  // 长度至少5位
+  if (value.trim().length >= 6) {
+    callBack();
+  } else {
+    callBack(new Error('密码至少6位'));
+  }
+};
+
+// 表单校验规则对象
+const rules = {
+  username: [
+    { required: true, trigger: 'blur', validator: validatorUsername }
+  ],
+  nickname: [
+    { required: true, trigger: 'blur', validator: validatorNickname }
+  ],
+  password: [
+    { required: true, trigger: 'blur', validator: validatorPassword }
+  ]
 };
 </script>
 
