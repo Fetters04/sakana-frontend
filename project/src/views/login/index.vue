@@ -1,7 +1,7 @@
 <template>
   <div class="login_container">
     <el-row>
-      <el-col :span="12" :xs="0"></el-col>
+      <el-col :span="8" :xs="0"></el-col>
       <el-col :span="12" :xs="24">
         <!--登录表单-->
         <el-form class="login_form" :model="loginForm" :rules="rules" ref="loginForms">
@@ -121,24 +121,52 @@ const rules = {
     position: relative;
     width: 80%;
     top: 30vh;
-    background: url('@/assets/images/login_form.png') no-repeat;
+    //background: url('@/assets/images/login_form.png') no-repeat;
+    /* 将 background-color 转换为 rgba 形式并设置透明度 */
+    background-color: rgba(255, 222, 233, 0.4);
+    /* 将线性渐变中的颜色转换为 rgba 形式并设置透明度 */
+    background-image: linear-gradient(135deg, rgba(255, 222, 233, 0.6) 0%, rgba(181, 255, 252, 0.6) 100%);
     background-size: cover;
     padding: 40px;
+    /* 添加边框样式 */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* 添加圆角 */
+    border-radius: 15px;
+    /* 添加阴影效果 */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    /* 设置字体 */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     h1 {
-      color: white;
+      color: #333; /* 调整标题颜色为深灰色，更易读 */
       font-size: 40px;
+      text-align: center; /* 标题居中 */
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8); /* 添加文本阴影 */
     }
 
     h2 {
-      color: white;
+      color: #555; /* 调整副标题颜色为中灰色 */
       font-size: 20px;
       margin: 20px 0;
+      text-align: center; /* 副标题居中 */
     }
 
     .login_btn {
       width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007BFF; /* 按钮背景颜色 */
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease; /* 添加过渡效果 */
     }
+
+    .login_btn:hover {
+      background-color: #0056b3; /* 鼠标悬停时按钮颜色变化 */
+    }
+
   }
 }
 </style>
