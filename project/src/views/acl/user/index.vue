@@ -11,8 +11,9 @@
       </el-form-item>
     </el-form>
   </el-card>
+  <!-- 主体内容 -->
   <el-card style="margin: 20px 0">
-    <el-button type="primary">点击用户</el-button>
+    <el-button @click="addUser" type="primary">添加用户</el-button>
     <el-button type="danger">批量删除</el-button>
     <!-- 展示用户信息 -->
     <el-table border style="margin: 20px 0" :data="userArr">
@@ -27,23 +28,48 @@
       <el-table-column label="操作" width="300px">
         <template #="{row, $index}">
           <el-button type="primary" size="small" icon="User">分配角色</el-button>
-          <el-button type="success" size="small" icon="User">编辑</el-button>
-          <el-button type="danger" size="small" icon="User">删除</el-button>
+          <el-button @click="updateUser(row)" type="success" size="small" icon="Edit">编辑</el-button>
+          <el-button type="danger" size="small" icon="Delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页器 -->
+    <el-pagination
+        v-model:current-page="pageNo"
+        v-model:page-size="pageSize"
+        :page-sizes="[5, 10, 20]"
+        :background="true"
+        layout="prev, pager, next, jumper, ->, sizes, total"
+        :total="total"
+        @current-change="getHasUser"
+        @size-change="getHasUser(1)"
+    />
   </el-card>
-  <!-- 分页器 -->
-  <el-pagination
-      v-model:current-page="pageNo"
-      v-model:page-size="pageSize"
-      :page-sizes="[5, 10, 20]"
-      :background="true"
-      layout="prev, pager, next, jumper, ->, sizes, total"
-      :total="total"
-      @current-change="getHasUser"
-      @size-change="getHasUser(1)"
-  />
+  <!-- 抽屉：添加用户|修改用户时展示 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4 style="font-size: 20px">添加用户</h4>
+    </template>
+    <template #default>
+      <el-form label-width="80px">
+        <el-form-item label="用户名">
+          <el-input style="width: 300px" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称">
+          <el-input style="width: 300px" placeholder="请输入昵称"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input style="width: 300px" placeholder="请输入密码"></el-input>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button size="large">取消</el-button>
+        <el-button size="large" type="primary">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +85,8 @@ let pageSize = ref<number>(5);
 let total = ref<number>(0);
 // 存储用户分页数据
 let userArr = ref<UserInfo[]>([]);
+// 控制抽屉的显示
+let drawer = ref<boolean>(false);
 
 onMounted(() => {
   // 获取用户分页数据
@@ -75,6 +103,18 @@ const getHasUser = async (pager = 1) => {
     userArr.value = result.data.records;
     total.value = result.data.total;
   }
+};
+
+// 添加用户按钮的回调
+const addUser = () => {
+  // 展示抽屉
+  drawer.value = true;
+};
+
+// 编辑按钮的回调
+const updateUser = () => {
+  // 展示抽屉
+  drawer.value = true;
 };
 
 </script>
