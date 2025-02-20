@@ -12,8 +12,8 @@ import useLayoutSettingStore from '@/store/modules/setting';
 import { ref, watch } from 'vue';
 
 let layoutSettingStore = useLayoutSettingStore();
-// 控制 p 标签的显示
-let showTitle = ref<boolean>(false);
+// 控制 p 标签的显示，默认展示
+let showTitle = ref<boolean>(true);
 
 // 监听 layoutSettingStore.fold 的变化
 watch(() => !layoutSettingStore.fold, (newValue) => {
