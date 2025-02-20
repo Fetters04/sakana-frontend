@@ -53,29 +53,30 @@
     <template #default>
       <el-form label-width="80px">
         <el-form-item label="用户名">
-          <el-input style="width: 300px" placeholder="请输入用户名"></el-input>
+          <el-input v-model="userParams.username" style="width: 300px" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item label="昵称">
-          <el-input style="width: 300px" placeholder="请输入昵称"></el-input>
+          <el-input v-model="userParams.nickname" style="width: 300px" placeholder="请输入昵称"></el-input>
         </el-form-item>
         <el-form-item label="密码">
-          <el-input style="width: 300px" placeholder="请输入密码"></el-input>
+          <el-input v-model="userParams.password" style="width: 300px" placeholder="请输入密码"></el-input>
         </el-form-item>
       </el-form>
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button size="large">取消</el-button>
-        <el-button size="large" type="primary">确定</el-button>
+        <el-button @click="cancel" size="large">取消</el-button>
+        <el-button @click="save" size="large" type="primary">确定</el-button>
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { HasUserResponseData, UserInfo } from '@/api/acl/user/type';
-import { reqUserInfo } from '@/api/acl/user';
+import { reqAddOrUpdateUser, reqUserInfo } from '@/api/acl/user';
+import { ElMessage } from 'element-plus';
 
 // 当前页码
 let pageNo = ref<number>(1);
@@ -87,6 +88,12 @@ let total = ref<number>(0);
 let userArr = ref<UserInfo[]>([]);
 // 控制抽屉的显示
 let drawer = ref<boolean>(false);
+// 收集用户信息
+let userParams = reactive<UserInfo>({
+  username: '',
+  nickname: '',
+  password: ''
+});
 
 onMounted(() => {
   // 获取用户分页数据
@@ -109,14 +116,48 @@ const getHasUser = async (pager = 1) => {
 const addUser = () => {
   // 展示抽屉
   drawer.value = true;
+  // 清空数据
+  Object.assign(userParams, {
+    username: '',
+    nickname: '',
+    password: ''
+  });
 };
 
 // 编辑按钮的回调
-const updateUser = () => {
+const updateUser = (row: UserInfo) => {
   // 展示抽屉
   drawer.value = true;
+  // 用户数据回显
+  Object.assign(userParams, row);
 };
 
+// 保存按钮的回调
+const save = async () => {
+  // 发请求添加|修改用户信息
+  let result: any = await reqAddOrUpdateUser(userParams);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: userParams.id ? '修改成功' : '添加成功'
+    });
+    // 获取最新用户分页数据
+    await getHasUser();
+  } else {
+    ElMessage({
+      type: 'error',
+      message: userParams.id ? '修改失败' : '添加失败'
+    });
+  }
+  // 关闭抽屉
+  drawer.value = false;
+};
+
+// 取消按钮的回调
+const cancel = () => {
+  // 关闭抽屉
+  drawer.value = false;
+};
 </script>
 
 <style scoped lang="scss">
