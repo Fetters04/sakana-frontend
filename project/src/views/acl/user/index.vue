@@ -48,7 +48,7 @@
   <!-- 抽屉：添加用户|修改用户时展示 -->
   <el-drawer v-model="drawer">
     <template #header>
-      <h4 style="font-size: 20px">添加用户</h4>
+      <h4 style="font-size: 20px">{{ userParams.id ? '修改用户' : '添加用户' }}</h4>
     </template>
     <template #default>
       <el-form label-width="80px" :model="userParams" :rules="rules" ref="formRef">
@@ -58,7 +58,7 @@
         <el-form-item label="昵称" prop="nickname">
           <el-input v-model="userParams.nickname" style="width: 300px" placeholder="请输入昵称"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="密码" prop="password" v-if="!userParams.id">
           <el-input v-model="userParams.password" style="width: 300px" placeholder="请输入密码"></el-input>
         </el-form-item>
       </el-form>
@@ -120,6 +120,7 @@ const addUser = () => {
   drawer.value = true;
   // 清空数据
   Object.assign(userParams, {
+    id: 0,
     username: '',
     nickname: '',
     password: ''
@@ -158,7 +159,7 @@ const save = async () => {
       message: userParams.id ? '修改成功' : '添加成功'
     });
     // 获取最新用户分页数据
-    await getHasUser();
+    await getHasUser(pageNo.value);
   } else {
     ElMessage({
       type: 'error',
