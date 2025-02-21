@@ -27,7 +27,7 @@
       <el-table-column label="更新时间" align="center" width="180px" prop="updateTime"></el-table-column>
       <el-table-column label="操作" width="300px">
         <template #="{row, $index}">
-          <el-button type="primary" size="small" icon="User">分配角色</el-button>
+          <el-button @click="setRole(row)" type="primary" size="small" icon="User">分配角色</el-button>
           <el-button @click="updateUser(row)" type="success" size="small" icon="Edit">编辑</el-button>
           <el-button type="danger" size="small" icon="Delete">删除</el-button>
         </template>
@@ -70,6 +70,38 @@
       </div>
     </template>
   </el-drawer>
+  <!-- 抽屉：分配角色时展示 -->
+  <el-drawer v-model="drawer2">
+    <template #header>
+      <h4 style="font-size: 20px">分配角色</h4>
+    </template>
+    <template #default>
+      <el-form label-width="80px">
+        <el-form-item label="用户名">
+          <el-input style="width: 300px" v-model="userParams.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="角色列表">
+          <el-checkbox v-model="checkAll"
+                       :indeterminate="isIndeterminate"
+                       @change="handleCheckAllChange">全选
+          </el-checkbox>
+          <!-- 显示职位的复选框 -->
+          <el-checkbox-group
+              v-model="checkedRoles"
+              @change="handleCheckedRolesChange"
+          >
+            <el-checkbox v-for="(role, index) in roles" :key="index" :label="role">{{ role }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button size="large">取消</el-button>
+        <el-button size="large" type="primary">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -86,8 +118,10 @@ let pageSize = ref<number>(5);
 let total = ref<number>(0);
 // 存储用户分页数据
 let userArr = ref<UserInfo[]>([]);
-// 控制抽屉的显示
+// 控制添加|修改用户抽屉的显示
 let drawer = ref<boolean>(false);
+// 控制分配角色抽屉的显示
+let drawer2 = ref<boolean>(false);
 // 收集用户信息
 let userParams = reactive<UserInfo>({
   username: '',
@@ -96,6 +130,20 @@ let userParams = reactive<UserInfo>({
 });
 // 获取Form组件实例
 let formRef = ref<any>();
+// 角色复选框的控制变量和回调方法
+const checkAll = ref<boolean>(false);
+const isIndeterminate = ref(true);
+const checkedRoles = ref(['前端', '后端']);
+const roles = ref(['前端', '后端', '产品', '测试']);
+const handleCheckAllChange = (val: boolean) => {
+  checkedRoles.value = val ? roles.value : [];
+  isIndeterminate.value = false;
+};
+const handleCheckedRolesChange = (value: string[]) => {
+  const checkedCount = value.length;
+  checkAll.value = checkedCount === roles.length;
+  isIndeterminate.value = checkedCount > 0 && checkedCount < roles.length;
+};
 
 onMounted(() => {
   // 获取用户分页数据
@@ -229,6 +277,14 @@ const rules = {
   password: [
     { required: true, trigger: 'blur', validator: validatorPassword }
   ]
+};
+
+// 分配角色按钮的回调
+const setRole = (row: UserInfo) => {
+  // 抽屉展示
+  drawer2.value = true;
+  // 用户数据回显
+  Object.assign(userParams, row);
 };
 </script>
 
