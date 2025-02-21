@@ -72,7 +72,7 @@ export const constantRoute = [
         component: () => import('@/views/acl/role/index.vue'),
         name: 'Role',
         meta: {
-          title: '用户管理',
+          title: '角色管理',
           icon: 'UserFilled'
         }
       },
