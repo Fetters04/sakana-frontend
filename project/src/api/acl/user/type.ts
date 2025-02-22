@@ -26,3 +26,26 @@ export interface HasUserResponseData extends ResponseData {
     searchCount: boolean;
   };
 }
+
+// 角色的类型
+export interface RoleData {
+  id?: number;
+  roleName: string;
+  createTime?: string;
+  updateTime?: string;
+}
+
+export interface AllRoleResponseData extends ResponseData {
+  data: {
+    // 当前用户的角色
+    assignRolesList: RoleData[];
+    // 全部角色
+    allRolesList: RoleData[];
+  };
+}
+
+// 分配角色接口参数类型
+export interface SetRoleData {
+  userId?: number;
+  roleIdList: number[];
+}

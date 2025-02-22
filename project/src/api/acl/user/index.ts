@@ -1,6 +1,6 @@
 // 用户管理模块接口
 import request from '@/utils/request';
-import { HasUserResponseData, UserInfo } from '@/api/acl/user/type';
+import { AllRoleResponseData, HasUserResponseData, SetRoleData, UserInfo } from '@/api/acl/user/type';
 
 enum API {
   // 获取用户账号分页信息
@@ -8,7 +8,11 @@ enum API {
   // 添加用户账号
   ADD_USER_URL = '/acl/user/save',
   // 修改用户账号
-  UPDATE_USER_URL = '/acl/user/update'
+  UPDATE_USER_URL = '/acl/user/update',
+  // 获取全部角色和当前账号角色
+  ALL_ROLE_URL = '/acl/user/toAssign/',
+  // 给已有用户分配角色
+  SET_ROLE_URL = '/acl/user/doAssignRole',
 }
 
 // 获取用户账号分页信息的接口
@@ -22,3 +26,9 @@ export const reqAddOrUpdateUser = (data: UserInfo) => {
     return request.post<any, any>(API.ADD_USER_URL, data);
   }
 };
+// 获取全部角色和当前账号角色的接口
+export const reqAllRole = (userId: number) =>
+    request.get<any, AllRoleResponseData>(API.ALL_ROLE_URL + userId);
+// 分配角色的接口
+export const reqSetUserRole = (data: SetRoleData) =>
+    request.post<any, any>(API.SET_ROLE_URL, data);

@@ -86,11 +86,8 @@
                        @change="handleCheckAllChange">全选
           </el-checkbox>
           <!-- 显示职位的复选框 -->
-          <el-checkbox-group
-              v-model="checkedRoles"
-              @change="handleCheckedRolesChange"
-          >
-            <el-checkbox v-for="(role, index) in roles" :key="index" :label="role">{{ role }}</el-checkbox>
+          <el-checkbox-group v-model="assignRolesList" @change="handleCheckedRolesChange">
+            <el-checkbox v-for="role in allRolesList" :key="role.id" :label="role">{{ role.roleName }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
       </el-form>
@@ -98,7 +95,7 @@
     <template #footer>
       <div style="flex: auto">
         <el-button size="large">取消</el-button>
-        <el-button size="large" type="primary">确定</el-button>
+        <el-button @click="doAssignRole" size="large" type="primary">确定</el-button>
       </div>
     </template>
   </el-drawer>
@@ -106,8 +103,8 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import { HasUserResponseData, UserInfo } from '@/api/acl/user/type';
-import { reqAddOrUpdateUser, reqUserInfo } from '@/api/acl/user';
+import { AllRoleResponseData, HasUserResponseData, RoleData, SetRoleData, UserInfo } from '@/api/acl/user/type';
+import { reqAddOrUpdateUser, reqAllRole, reqSetUserRole, reqUserInfo } from '@/api/acl/user';
 import { ElMessage } from 'element-plus';
 
 // 当前页码
@@ -132,17 +129,17 @@ let userParams = reactive<UserInfo>({
 let formRef = ref<any>();
 // 角色复选框的控制变量和回调方法
 const checkAll = ref<boolean>(false);
-const isIndeterminate = ref(true);
-const checkedRoles = ref(['前端', '后端']);
-const roles = ref(['前端', '后端', '产品', '测试']);
+const isIndeterminate = ref<boolean>(true);
+const assignRolesList = ref<RoleData[]>([]);
+const allRolesList = ref<RoleData[]>([]);
 const handleCheckAllChange = (val: boolean) => {
-  checkedRoles.value = val ? roles.value : [];
+  assignRolesList.value = val ? allRolesList.value : [];
   isIndeterminate.value = false;
 };
 const handleCheckedRolesChange = (value: string[]) => {
   const checkedCount = value.length;
-  checkAll.value = checkedCount === roles.length;
-  isIndeterminate.value = checkedCount > 0 && checkedCount < roles.length;
+  checkAll.value = checkedCount === allRolesList.value.length;
+  isIndeterminate.value = checkedCount > 0 && checkedCount < allRolesList.value.length;
 };
 
 onMounted(() => {
@@ -245,7 +242,6 @@ const validatorUsername = (rule, value, callBack) => {
     callBack(new Error('用户名至少5位'));
   }
 };
-
 // 校验昵称的回调函数
 const validatorNickname = (rule: any, value: any, callBack: any) => {
   // 长度至少5位
@@ -255,7 +251,6 @@ const validatorNickname = (rule: any, value: any, callBack: any) => {
     callBack(new Error('昵称至少2位'));
   }
 };
-
 // 校验昵称的回调函数
 const validatorPassword = (rule: any, value: any, callBack: any) => {
   // 长度至少5位
@@ -265,7 +260,6 @@ const validatorPassword = (rule: any, value: any, callBack: any) => {
     callBack(new Error('密码至少6位'));
   }
 };
-
 // 表单校验规则对象
 const rules = {
   username: [
@@ -280,11 +274,39 @@ const rules = {
 };
 
 // 分配角色按钮的回调
-const setRole = (row: UserInfo) => {
-  // 抽屉展示
-  drawer2.value = true;
+const setRole = async (row: UserInfo) => {
+
   // 用户数据回显
   Object.assign(userParams, row);
+  // 发送请求获取全部角色数据和当前用户的角色数据
+  let result: AllRoleResponseData = await reqAllRole(row.id);
+  if (result.code == 200) {
+    allRolesList.value = result.data.allRolesList;
+    assignRolesList.value = result.data.assignRolesList;
+    // 展示抽屉
+    drawer2.value = true;
+  }
+};
+
+// 确定按钮的回调（分配角色）
+const doAssignRole = async () => {
+  // 收集参数
+  let data: SetRoleData = {
+    userId: userParams.id,
+    roleIdList: assignRolesList.value.map(item => item.id)
+  };
+  // 发送请求分配用户角色
+  let result = await reqSetUserRole(data);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '分配角色成功'
+    });
+    // 关闭抽屉
+    drawer2.value = false;
+    // 更新完再次获取数据
+    await getHasUser(pageNo.value);
+  }
 };
 </script>
 
