@@ -20,8 +20,8 @@ enum API {
 }
 
 // 获取用户账号分页信息的接口
-export const reqUserInfo = (currentPage: number, pageSize: number) =>
-    request.get<any, HasUserResponseData>(API.USER_URL + `/${currentPage}/${pageSize}`);
+export const reqUserInfo = (currentPage: number, pageSize: number, username: number) =>
+    request.get<any, HasUserResponseData>(API.USER_URL + `/${currentPage}/${pageSize}?username=${username}`);
 // 添加用户|修改用户的接口
 export const reqAddOrUpdateUser = (data: UserInfo) => {
   if (data.id) {

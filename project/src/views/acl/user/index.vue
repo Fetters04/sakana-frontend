@@ -3,11 +3,11 @@
     <!-- 搜索框 -->
     <el-form inline>
       <el-form-item label="用户名">
-        <el-input placeholder="请输入搜索用户名" style="width: 200px"></el-input>
+        <el-input v-model="keyword" placeholder="请输入搜索用户名" style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">搜索</el-button>
-        <el-button>重置</el-button>
+        <el-button @click="search" type="primary" :disabled="!keyword">搜索</el-button>
+        <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -140,6 +140,8 @@ let userParams = reactive<UserInfo>({
 let formRef = ref<any>();
 // 存储批量删除用户
 let selectUserArr = ref<number[]>([]);
+// 收集搜索框输入
+let keyword = ref<string>('');
 // 角色复选框的控制变量和回调方法
 const checkAll = ref<boolean>(false);
 const isIndeterminate = ref<boolean>(true);
@@ -165,7 +167,7 @@ const getHasUser = async (pager = 1) => {
   // 收集当前页码
   pageNo.value = pager;
   // 发请求获取用户分页数据
-  let result: HasUserResponseData = await reqUserInfo(pageNo.value, pageSize.value);
+  let result: HasUserResponseData = await reqUserInfo(pageNo.value, pageSize.value, keyword.value);
   if (result.code == 200) {
     userArr.value = result.data.records;
     total.value = result.data.total;
@@ -352,6 +354,16 @@ const batchDeleteUser = async () => {
     });
     await getHasUser();
   }
+};
+
+// 搜索按钮的回调
+const search = () => {
+  getHasUser();
+};
+// 重置按钮的回调
+const reset = () => {
+  keyword.value = '';
+  getHasUser();
 };
 </script>
 
