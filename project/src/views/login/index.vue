@@ -5,6 +5,7 @@
       <el-col :span="12" :xs="24">
         <!--登录表单-->
         <el-form class="login_form" :model="loginForm" :rules="rules" ref="loginForms">
+          <img src="../../assets/images/SAKANA_LOGO.jpg" alt="SAKANA" class="login_logo"/>
           <h1>Hello</h1>
           <h2>欢迎来到甄选运营平台</h2>
           <el-form-item prop="username">
@@ -120,7 +121,7 @@ const rules = {
   .login_form {
     position: relative;
     width: 80%;
-    top: 30vh;
+    top: 20vh;
     //background: url('@/assets/images/login_form.png') no-repeat;
     /* 将 background-color 转换为 rgba 形式并设置透明度 */
     background-color: rgba(255, 222, 233, 0.4);
@@ -136,6 +137,13 @@ const rules = {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     /* 设置字体 */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    .login_logo {
+      display: block;
+      margin: 10px auto;
+      width: 150px;
+      border-radius: 30%;
+    }
 
     h1 {
       color: #333; /* 调整标题颜色为深灰色，更易读 */
