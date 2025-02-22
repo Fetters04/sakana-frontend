@@ -14,9 +14,9 @@
   <!-- 主体内容 -->
   <el-card style="margin: 20px 0">
     <el-button @click="addUser" type="primary">添加用户</el-button>
-    <el-button type="danger">批量删除</el-button>
+    <el-button @click="batchDeleteUser" type="danger" :disabled="selectUserArr.length==0">批量删除</el-button>
     <!-- 展示用户信息 -->
-    <el-table border style="margin: 20px 0" :data="userArr">
+    <el-table @selection-change="selectChange" border style="margin: 20px 0" :data="userArr">
       <el-table-column type="selection"></el-table-column>
       <el-table-column label="#" align="center" width="80px" type="index"></el-table-column>
       <el-table-column label="ID" align="center" width="120px" prop="id"></el-table-column>
@@ -29,7 +29,11 @@
         <template #="{row, $index}">
           <el-button @click="setRole(row)" type="primary" size="small" icon="User">分配角色</el-button>
           <el-button @click="updateUser(row)" type="success" size="small" icon="Edit">编辑</el-button>
-          <el-button type="danger" size="small" icon="Delete">删除</el-button>
+          <el-popconfirm :title="`您确定删除${row.username}吗？`" width="260px" @confirm="deleteUser(row)">
+            <template #reference>
+              <el-button type="danger" size="small" icon="Delete">删除</el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -104,7 +108,14 @@
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { AllRoleResponseData, HasUserResponseData, RoleData, SetRoleData, UserInfo } from '@/api/acl/user/type';
-import { reqAddOrUpdateUser, reqAllRole, reqSetUserRole, reqUserInfo } from '@/api/acl/user';
+import {
+  reqAddOrUpdateUser,
+  reqAllRole,
+  reqBatchRemoveUser,
+  reqRemoveUser,
+  reqSetUserRole,
+  reqUserInfo
+} from '@/api/acl/user';
 import { ElMessage } from 'element-plus';
 
 // 当前页码
@@ -127,6 +138,8 @@ let userParams = reactive<UserInfo>({
 });
 // 获取Form组件实例
 let formRef = ref<any>();
+// 存储批量删除用户
+let selectUserArr = ref<number[]>([]);
 // 角色复选框的控制变量和回调方法
 const checkAll = ref<boolean>(false);
 const isIndeterminate = ref<boolean>(true);
@@ -208,7 +221,7 @@ const save = async () => {
   } else {
     ElMessage({
       type: 'error',
-      message: userParams.id ? '修改失败' : '添加失败'
+      message: result.message
     });
   }
   // 关闭抽屉
@@ -275,7 +288,6 @@ const rules = {
 
 // 分配角色按钮的回调
 const setRole = async (row: UserInfo) => {
-
   // 用户数据回显
   Object.assign(userParams, row);
   // 发送请求获取全部角色数据和当前用户的角色数据
@@ -306,6 +318,39 @@ const doAssignRole = async () => {
     drawer2.value = false;
     // 更新完再次获取数据
     await getHasUser(pageNo.value);
+  }
+};
+
+// 删除单个用户
+const deleteUser = async (row: UserInfo) => {
+  let result: any = await reqRemoveUser(row.id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    });
+    await getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1);
+  }
+};
+
+// table 复选框勾选时触发
+const selectChange = (value) => {
+  // value 是注入勾选的用户对象
+  selectUserArr.value = value;
+};
+
+// 批量删除按钮的回调
+const batchDeleteUser = async () => {
+  // 整理参数
+  let ids: number[] = selectUserArr.value.map(item => item.id);
+  console.log(ids);
+  let result: any = await reqBatchRemoveUser(ids);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '批量删除成功'
+    });
+    await getHasUser();
   }
 };
 </script>
