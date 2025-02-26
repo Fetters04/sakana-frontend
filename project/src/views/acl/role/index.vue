@@ -41,23 +41,24 @@
     />
   </el-card>
   <!-- 添加角色|修改角色的对话框 -->
-  <el-dialog v-model="dialogVisible" title="添加角色">
-    <el-form>
-      <el-form-item label="角色名">
-        <el-input placeholder="请输入角色名"></el-input>
+  <el-dialog v-model="dialogVisible" :title="roleParams.id?'更新角色':'添加角色'">
+    <el-form :model="roleParams" :rules="rules" ref="formRef">
+      <el-form-item label="角色名" prop="roleName">
+        <el-input placeholder="请输入角色名" v-model="roleParams.roleName"></el-input>
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+      <el-button type="primary" @click="save">确定</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { reqAllRoleList } from '@/api/acl/role';
+import { nextTick, onMounted, reactive, ref } from 'vue';
+import { reqAddOrUpdateRole, reqAllRoleList } from '@/api/acl/role';
 import { HasRoleResponseData, RoleInfo } from '@/api/acl/role/type';
+import { ElMessage } from 'element-plus';
 
 let pageNo = ref<number>(1);
 let pageSize = ref<number>(10);
@@ -68,6 +69,12 @@ let keyword = ref<string>('');
 let allRole = ref<RoleInfo[]>([]);
 // 控制对话框的显示与隐藏
 let dialogVisible = ref<boolean>(false);
+// 收集新增角色数据
+let roleParams = reactive<RoleInfo>({
+  roleName: ''
+});
+// 获取Form组件实例
+let formRef = ref<any>();
 
 onMounted(() => {
   // 获取角色数据
@@ -93,11 +100,59 @@ const reset = () => {
 // 添加角色按钮的回调
 const addRole = () => {
   dialogVisible.value = true;
+  // 清空数据
+  Object.assign(roleParams, {
+    id: 0,
+    roleName: ''
+  });
+  // 清除上一次校验提示信息
+  nextTick(() => {
+    formRef.value.clearValidate('roleName');
+  });
 };
 
 // 编辑按钮的回调
 const updateRole = (row: RoleInfo) => {
+  console.log(row);
   dialogVisible.value = true;
+  // 用户数据回显
+  Object.assign(roleParams, row);
+  // 清除上一次校验提示信息
+  nextTick(() => {
+    formRef.value.clearValidate('roleName');
+  });
+};
+
+const validatorRoleName = (rule: any, value: any, callback: any) => {
+  if (value.trim().length >= 2) {
+    callback();
+  } else {
+    callback(new Error('角色名至少2位'));
+  }
+};
+// 角色名校验规则
+const rules = {
+  roleName: [
+    { required: true, trigger: 'blur', validator: validatorRoleName }
+  ]
+};
+
+// 确定按钮的回调
+const save = async () => {
+  // 保证字段校验通过才能发请求
+  await formRef.value.validate();
+  // 发请求添加|修改角色信息
+  let result: any = await reqAddOrUpdateRole(roleParams);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: roleParams.id ? '修改成功' : '添加成功'
+    });
+    // 获取最新角色分页数据
+    await getHasRole(roleParams.id ? pageNo.value : 1);
+    dialogVisible.value = false;
+  }
+
 };
 </script>
 
