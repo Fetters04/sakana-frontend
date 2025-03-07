@@ -4,7 +4,8 @@
   <el-popover placement="bottom" title="主题设置" trigger="hover">
     <el-form>
       <el-form-item label="主题颜色">
-        <el-color-picker v-model="color" show-alpha :predefine="predefineColors"/>
+        <el-color-picker @change="setColor" v-model="color" show-alpha
+                         :predefine="predefineColors" :teleported="false"/>
       </el-form-item>
       <el-form-item label="暗黑模式">
         <el-switch @change="changeDark" v-model="dark" size="default" inline-prompt
@@ -99,6 +100,16 @@ const changeDark = () => {
   // 获取HTML根节点
   let html = document.documentElement;
   dark.value ? html.className = 'dark' : html.className = '';
+};
+
+// 设置主题颜色
+const setColor = () => {
+  let html = document.documentElement;
+  html.style.setProperty('--el-color-primary', color.value);
+  html.style.setProperty('--el-color-success', color.value);
+  html.style.setProperty('--el-color-danger', color.value);
+  html.style.setProperty('--el-color-info', color.value);
+  html.style.setProperty('--el-color-warning', color.value);
 };
 </script>
 
