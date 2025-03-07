@@ -10,7 +10,7 @@
     </el-table-column>
     <el-table-column label="重量(g)" prop="weight"></el-table-column>
     <el-table-column label="价格(元)" prop="price"></el-table-column>
-    <el-table-column label="操作" fixed="right">
+    <el-table-column label="操作" fixed="right" width="210px">
       <template #="{row, $index}">
         <el-button @click="updateSale(row)" :type="row.isSale==1?'success':'primary'" size="small"
                    :icon="row.isSale==1?'Bottom':'Top'" :title="row.isSale==1?'下架':'上架'"></el-button>
