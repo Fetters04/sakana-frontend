@@ -8,6 +8,8 @@ enum API {
   ADD_MENU_URL = '/acl/permission/save',
   // 更新菜单
   UPDATE_MENU_URL = '/acl/permission/update',
+  // 删除菜单
+  DELETE_MENU_URL = '/acl/permission/remove'
 }
 
 // 获取菜单数据
@@ -21,3 +23,6 @@ export const reqAddOrUpdateMenu = (data: MenuParams) => {
     return request.post<any, any>(API.ADD_MENU_URL, data);
   }
 };
+// 删除菜单
+export const reqRemoveMenu = (id: number) =>
+    request.delete<any, any>(API.DELETE_MENU_URL + `/${id}`);

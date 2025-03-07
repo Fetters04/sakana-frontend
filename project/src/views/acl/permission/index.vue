@@ -10,7 +10,11 @@
           {{ row.level == 3 ? '添加功能' : '添加菜单' }}
         </el-button>
         <el-button @click="updatePermission(row)" type="success" size="small" :disabled="row.level==1">编辑</el-button>
-        <el-button type="danger" size="small" :disabled="row.level==1">删除</el-button>
+        <el-popconfirm @confirm="deletePermission(row.id)" :title="`您确定要删除${row.name}吗？`" width="260px">
+          <template #reference>
+            <el-button type="danger" size="small" :disabled="row.level==1">删除</el-button>
+          </template>
+        </el-popconfirm>
       </template>
     </el-table-column>
   </el-table>
@@ -33,7 +37,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import { reqAddOrUpdateMenu, reqAllPermission } from '@/api/acl/menu';
+import { reqAddOrUpdateMenu, reqAllPermission, reqRemoveMenu } from '@/api/acl/menu';
 import { MenuParams, Permission, PermissionResponseData } from '@/api/acl/menu/type';
 import { ElMessage } from 'element-plus';
 
@@ -133,6 +137,18 @@ const rules = {
   code: [
     { required: true, trigger: 'blur', validator: validatorCode }
   ]
+};
+
+// 删除按钮的回调
+const deletePermission = async (id: number) => {
+  let result = await reqRemoveMenu(id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    })
+    await getHasPermission();
+  }
 };
 </script>
 
