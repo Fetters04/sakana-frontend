@@ -22,3 +22,12 @@ export interface Permission {
 export interface PermissionResponseData extends ResponseData {
   data: Permission[];
 }
+
+// 添加与修改菜单携带参数类型
+export interface MenuParams {
+  id?: number;
+  pid: number;
+  name: string;
+  code: string
+  level: number;
+}
