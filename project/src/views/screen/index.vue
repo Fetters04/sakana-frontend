@@ -5,7 +5,11 @@
         <Top/>
       </div>
       <div class="bottom">
-        <div class="left">左</div>
+        <div class="left">
+          <Tourist class="tourist"/>
+          <Sex class="sex"/>
+          <Age class="age"/>
+        </div>
         <div class="center">中</div>
         <div class="right">右</div>
       </div>
@@ -17,6 +21,9 @@
 import { onMounted, ref } from 'vue';
 // 引入子组件
 import Top from './components/top/index.vue';
+import Tourist from './components/tourist/index.vue';
+import Sex from './components/sex/index.vue';
+import Age from './components/age/index.vue';
 
 // 获取数据大屏展示内容盒子的DOM元素
 let screen = ref();
@@ -63,6 +70,23 @@ window.onresize = () => {
 
       .left {
         flex: 1;
+        height: 1040px;
+        display: flex;
+        flex-direction: column;
+
+        .tourist {
+          flex: 1.5;
+        }
+
+        .sex {
+          flex: 1;
+          background: green;
+        }
+
+        .age {
+          flex: 1;
+          background: hotpink;
+        }
       }
 
       .right {

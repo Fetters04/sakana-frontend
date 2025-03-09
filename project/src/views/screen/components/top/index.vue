@@ -48,7 +48,7 @@ const goHome = () => {
   height: 100%;
 
   .left {
-    flex: 1;
+    flex: 1.5;
     background: url("../../images/dataScreen-header-left-bg.png") no-repeat;
     background-size: cover;
 
@@ -66,7 +66,7 @@ const goHome = () => {
   }
 
   .right {
-    flex: 1;
+    flex: 1.5;
     background: url("../../images/dataScreen-header-left-bg.png") no-repeat;
     background-size: cover;
     display: flex;
