@@ -80,7 +80,6 @@ window.onresize = () => {
 
         .sex {
           flex: 1;
-          background: green;
         }
 
         .age {
