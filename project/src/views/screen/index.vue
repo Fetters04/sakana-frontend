@@ -14,7 +14,11 @@
           <Map class="map"/>
           <Line class="line"/>
         </div>
-        <div class="right">右</div>
+        <div class="right">
+          <Rank class="rank"/>
+          <Year class="year"/>
+          <Counter class="counter"/>
+        </div>
       </div>
     </div>
   </div>
@@ -29,6 +33,9 @@ import Sex from './components/sex/index.vue';
 import Age from './components/age/index.vue';
 import Map from './components/map/index.vue';
 import Line from './components/line/index.vue';
+import Rank from './components/rank/index.vue';
+import Year from './components/year/index.vue';
+import Counter from './components/counter/index.vue';
 
 // 获取数据大屏展示内容盒子的DOM元素
 let screen = ref();
@@ -94,6 +101,22 @@ window.onresize = () => {
 
       .right {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .rank {
+          flex: 1.5;
+        }
+
+        .year {
+          flex: 1;
+          background: red;
+        }
+
+        .counter {
+          flex: 1;
+          background: orange;
+        }
       }
 
       .center {
