@@ -110,12 +110,10 @@ window.onresize = () => {
 
         .year {
           flex: 1;
-          background: red;
         }
 
         .counter {
           flex: 1;
-          background: orange;
         }
       }
 
