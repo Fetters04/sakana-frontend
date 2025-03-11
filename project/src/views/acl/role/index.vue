@@ -24,7 +24,11 @@
         <template #="{row, $index}">
           <el-button @click="setPermission(row)" type="primary" size="small" icon="User">分配权限</el-button>
           <el-button @click="updateRole(row)" type="success" size="small" icon="Edit">编辑</el-button>
-          <el-button type="danger" size="small" icon="Delete">删除</el-button>
+          <el-popconfirm :title="`您确定要删除${row.roleName}吗？`" width="260px" @confirm="deleteRole(row.id)">
+            <template #reference>
+              <el-button type="danger" size="small" icon="Delete">删除</el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -80,11 +84,10 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import { reqAddOrUpdateRole, reqAllRoleList, reqRoleMenuList, reqSetPermission } from '@/api/acl/role';
+import { reqAddOrUpdateRole, reqAllRoleList, reqRemoveRole, reqRoleMenuList, reqSetPermission } from '@/api/acl/role';
 import { HasRoleResponseData, RoleInfo } from '@/api/acl/role/type';
 import { ElMessage } from 'element-plus';
 import { Permission, PermissionResponseData } from '@/api/acl/menu/type';
-import { root } from 'postcss';
 
 let pageNo = ref<number>(1);
 let pageSize = ref<number>(10);
@@ -236,6 +239,18 @@ const confirm = async () => {
     });
     // 页面刷新
     window.location.reload();
+  }
+};
+
+// 删除角色
+const deleteRole = async (id: number) => {
+  let result = await reqRemoveRole(id);
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    });
+    await getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1);
   }
 };
 </script>
