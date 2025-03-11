@@ -1,5 +1,3 @@
-import { UserInfo } from '@/api/acl/user/type';
-
 export interface ResponseData {
   code: number;
   message: string;

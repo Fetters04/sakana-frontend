@@ -6,7 +6,7 @@
     <el-table-column label="修改时间" prop="updateTime"></el-table-column>
     <el-table-column label="操作">
       <template #="{row, $index}">
-        <el-button @click="addPermission(row)" type="primary" size="small" :disabled="row.level==4">
+        <el-button @click="addPermission(row)" type="primary" size="small" v-if="row.level!=4">
           {{ row.level == 3 ? '添加功能' : '添加菜单' }}
         </el-button>
         <el-button @click="updatePermission(row)" type="success" size="small" :disabled="row.level==1">编辑</el-button>

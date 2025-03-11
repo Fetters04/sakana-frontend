@@ -22,7 +22,7 @@
       <el-table-column label="更新时间" align="center" prop="updateTime"></el-table-column>
       <el-table-column label="操作" width="300px">
         <template #="{row, $index}">
-          <el-button type="primary" size="small" icon="User">分配权限</el-button>
+          <el-button @click="setPermission(row)" type="primary" size="small" icon="User">分配权限</el-button>
           <el-button @click="updateRole(row)" type="success" size="small" icon="Edit">编辑</el-button>
           <el-button type="danger" size="small" icon="Delete">删除</el-button>
         </template>
@@ -52,13 +52,39 @@
       <el-button type="primary" @click="save">确定</el-button>
     </template>
   </el-dialog>
+  <!-- 分配权限的抽屉 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4>分配菜单与按钮的权限</h4>
+    </template>
+    <template #default>
+      <!-- 树形控件 -->
+      <el-tree
+          ref="tree"
+          :data="menuArr"
+          show-checkbox
+          node-key="id"
+          default-expand-all
+          :default-checked-keys="selectArr"
+          :props="defaultProps"
+      />
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="drawer=false">取消</el-button>
+        <el-button type="primary" @click="confirm">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import { reqAddOrUpdateRole, reqAllRoleList } from '@/api/acl/role';
+import { reqAddOrUpdateRole, reqAllRoleList, reqRoleMenuList, reqSetPermission } from '@/api/acl/role';
 import { HasRoleResponseData, RoleInfo } from '@/api/acl/role/type';
 import { ElMessage } from 'element-plus';
+import { Permission, PermissionResponseData } from '@/api/acl/menu/type';
+import { root } from 'postcss';
 
 let pageNo = ref<number>(1);
 let pageSize = ref<number>(10);
@@ -75,6 +101,19 @@ let roleParams = reactive<RoleInfo>({
 });
 // 获取Form组件实例
 let formRef = ref<any>();
+// 控制抽屉展示
+let drawer = ref<boolean>(false);
+// 树形结构
+const defaultProps = {
+  children: 'children',
+  label: 'name'
+};
+// 存储权限数据
+let menuArr = ref<Permission[]>([]);
+// 存储勾选的四级节点ID
+let selectArr = ref<number[]>([]);
+// 获取树形组件实例
+let tree = ref<any>();
 
 onMounted(() => {
   // 获取角色数据
@@ -152,7 +191,52 @@ const save = async () => {
     await getHasRole(roleParams.id ? pageNo.value : 1);
     dialogVisible.value = false;
   }
+};
 
+// 分配权限按钮的回调
+const setPermission = async (row: RoleInfo) => {
+  drawer.value = true;
+  // 收集当前要分配权限的数据
+  Object.assign(roleParams, row);
+  // 根据角色获取对应权限
+  let result: PermissionResponseData = await reqRoleMenuList(roleParams.id);
+  if (result.code == 200) {
+    menuArr.value = result.data;
+    selectArr.value = filterSelectArr(menuArr.value, []);
+  }
+};
+
+// 过滤出勾选的四级权限id
+const filterSelectArr = (allData: any, initArr: any) => {
+  allData.forEach((item: any) => {
+    if (item.select && item.level == 4) initArr.push(item.id);
+    if (item.children && item.children.length > 0) {
+      filterSelectArr(item.children, initArr);
+    }
+  });
+  return initArr;
+};
+
+// 确定按钮的回调
+const confirm = async () => {
+  // 角色ID
+  const roleId = roleParams.id;
+  // 选中根节点ID
+  let rootIds = tree.value.getCheckedKeys();
+  // 半选节点ID
+  let halfIds = tree.value.getHalfCheckedKeys();
+  // 下发权限
+  let selectedIds = rootIds.concat(halfIds);
+  let result = await reqSetPermission(roleId, selectedIds);
+  if (result.code == 200) {
+    drawer.value = false;
+    ElMessage({
+      type: 'success',
+      message: '分配权限成功'
+    });
+    // 页面刷新
+    window.location.reload();
+  }
 };
 </script>
 
