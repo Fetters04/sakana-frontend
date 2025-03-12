@@ -6,6 +6,7 @@ import { constantRoute } from './routes.ts';
 let router = createRouter({
   // 路由模式：hash
   history: createWebHashHistory(),
+  // 注册路由
   routes: constantRoute,
   // 滚动行为
   scrollBehavior() {

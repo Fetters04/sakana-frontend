@@ -38,7 +38,8 @@ router.beforeEach(async (to: any, from: any, next: any) => {
         try {
           // 获取用户信息
           await userStore.userInfo();
-          next();
+          // 保证路由加载完毕才放行（处理追加路由的延迟出现空白页面情况）
+          next({...to});
         } catch (e) {
           // token 过期 | 用户手动修改本地存储token
           // 退出登录 -> 用户相关数据清空

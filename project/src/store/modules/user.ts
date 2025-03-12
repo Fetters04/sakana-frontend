@@ -1,13 +1,29 @@
 // 创建用户相关小仓库
 import { defineStore } from 'pinia';
 // 引入接口
-import { reqLogin, reqUserInfo, reqLogout } from '@/api/user';
+import { reqLogin, reqLogout, reqUserInfo } from '@/api/user';
 import type { UserState } from './types/type.ts';
 // 引入操作本地存储的工具方法
 import { GET_TOKEN, REMOVE_TOKEN, SET_TOKEN } from '@/utils/token.ts';
 // 引入路由（常量路由）
-import { constantRoute } from '@/router/routes';
+import { anyRoute, asyncRoute, constantRoute } from '@/router/routes';
 import { loginFormData, loginResponseData, userInfoResponseData } from '@/api/user/type';
+import router from '@/router';
+import resetRouter from '@/router';
+// 引入深拷贝方法
+import cloneDeep from 'lodash/cloneDeep';
+
+// 用于过滤当前用户需要展示的异步路由
+function filterAsyncRoute(asyncRoute: any, routes: any) {
+  return asyncRoute.filter((item: any) => {
+    if (routes.includes(item.name)) {
+      if (item.children && item.children.length > 0) {
+        item.children = filterAsyncRoute(item.children, routes);
+      }
+      return true;
+    }
+  });
+}
 
 let useUserStore = defineStore('User', {
   // 小仓库存储数据地方
@@ -45,6 +61,14 @@ let useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.username = result.data.username;
         this.avatar = result.data.avatar;
+        // 过滤出当前用户的异步路由
+        let userAsyncRoute = filterAsyncRoute(cloneDeep(asyncRoute), result.data.routes);
+        // 用户可见的菜单
+        this.menuRoutes = [...constantRoute, ...userAsyncRoute, ...anyRoute];
+        // 路由器当前管理只有常量路由，动态追加异步路由、任意路由
+        [...userAsyncRoute, ...anyRoute].forEach((route: any) => {
+          router.addRoute(route);
+        });
         return 'ok';
       } else {
         return Promise.reject('获取用户信息失败');
@@ -54,12 +78,21 @@ let useUserStore = defineStore('User', {
     async userLogout() {
       // 退出登录请求
       let result: any = await reqLogout();
-      console.log(result);
       if (result.code == 200) {
         this.token = '';
         this.username = '';
         this.avatar = '';
         REMOVE_TOKEN();
+        // 清空动态追加的路由（处理切换角色后还能访问之前角色权限问题）
+        router.getRoutes().forEach(route => {
+          if (route.name) { // 确保路由有名称
+            // 检查当前路由是否不在 constantRoute 中
+            const isConstantRoute = constantRoute.some(constRoute => constRoute.name === route.name);
+            if (!isConstantRoute) {
+              router.removeRoute(route.name);
+            }
+          }
+        });
         return 'ok';
       }
 
