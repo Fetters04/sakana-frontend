@@ -103,10 +103,10 @@ const validatorPassword = (rule: any, value: any, callback: any) => {
 // 定义表单校验需要的配置对象
 const rules = {
   username: [
-    { trigger: 'change', validator: validatorUserName }
+    { trigger: 'blur', validator: validatorUserName }
   ],
   password: [
-    { trigger: 'change', validator: validatorPassword }
+    { trigger: 'blur', validator: validatorPassword }
   ]
 };
 </script>

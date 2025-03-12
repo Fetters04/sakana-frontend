@@ -19,6 +19,8 @@ import pinia from './store';
 import './permission';
 // 引入暗黑模式样式
 import 'element-plus/theme-chalk/dark/css-vars.css';
+// 引入自定义指令文件
+import { isHasButton } from '@/directive/has';
 
 const app = createApp(App);
 
@@ -31,5 +33,7 @@ app.use(globalComponent);
 app.use(router);
 // 安装仓库
 app.use(pinia);
+// 全局应用自定义指令
+isHasButton(app);
 
 app.mount('#app');

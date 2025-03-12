@@ -2,7 +2,7 @@
   <!--数据展示区-->
   <el-card class="box-card">
     <!--添加品牌按钮-->
-    <el-button type="primary" size="large" icon="Plus" @click="addTrademark">添加品牌</el-button>
+    <el-button v-has="`btn.Trademark.add`" type="primary" size="large" icon="Plus" @click="addTrademark">添加品牌</el-button>
     <!--表格组件：展示数据-->
     <el-table style="margin: 20px 0" border :data="trademarkArr">
       <el-table-column label="序号" width="150px" align="center" type="index"/>
@@ -18,11 +18,11 @@
       </el-table-column>
       <el-table-column label="品牌操作" align="center">
         <template #="{row, $index}">
-          <el-button type="success" size="default" icon="Edit" @click="updateTrademark(row)"></el-button>
+          <el-button v-has="`btn.Trademark.update`" title="修改品牌" type="success" size="default" icon="Edit" @click="updateTrademark(row)"></el-button>
           <el-popconfirm :title="`您确定要删除${row.tmName}？`" width="200px" icon="Delete"
                          @confirm="removeTrademark(row.id)">
             <template #reference>
-              <el-button type="danger" size="default" icon="Delete"></el-button>
+              <el-button v-has="`btn.Trademark.remove`" title="删除品牌" type="danger" size="default" icon="Delete"></el-button>
             </template>
           </el-popconfirm>
         </template>

@@ -12,13 +12,13 @@
     <el-table-column label="价格(元)" prop="price"></el-table-column>
     <el-table-column label="操作" fixed="right" width="210px">
       <template #="{row, $index}">
-        <el-button @click="updateSale(row)" :type="row.isSale==1?'success':'primary'" size="small"
+        <el-button v-has="`btn.Sku.updown`" @click="updateSale(row)" :type="row.isSale==1?'success':'primary'" size="small"
                    :icon="row.isSale==1?'Bottom':'Top'" :title="row.isSale==1?'下架':'上架'"></el-button>
-        <el-button type="warning" size="small" icon="Edit" title="修改SKU"></el-button>
-        <el-button @click="findSku(row)" type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
+        <el-button v-has="`btn.Sku.update`" type="warning" size="small" icon="Edit" title="修改SKU"></el-button>
+        <el-button v-has="`btn.Sku.detail`" @click="findSku(row)" type="info" size="small" icon="InfoFilled" title="查看SKU详情"></el-button>
         <el-popconfirm :title="`您确定删除${row.skuName}吗？`" width="240px" @confirm="deleteSku(row)">
           <template #reference>
-            <el-button type="danger" size="small" icon="Delete" title="删除SKU"></el-button>
+            <el-button v-has="`btn.Sku.remove`" type="danger" size="small" icon="Delete" title="删除SKU"></el-button>
           </template>
         </el-popconfirm>
       </template>

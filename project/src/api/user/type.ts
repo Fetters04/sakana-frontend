@@ -22,7 +22,7 @@ export interface userInfoResponseData extends ResponseData {
     username: string;
     avatar: string;
     roles: string[];
-    button: string[];
+    buttons: string[];
     routes: string[];
   }
 }

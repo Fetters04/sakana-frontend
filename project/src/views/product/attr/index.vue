@@ -4,7 +4,8 @@
   <el-card style="margin: 20px 0">
     <!--展示三级分类数据的结构-->
     <div v-if="scene==0">
-      <el-button @click="addAttr"
+      <el-button v-has="`btn.Attr.add`"
+                 @click="addAttr"
                  :disabled="!categoryStore.c3Id"
                  type="primary" size="large" icon="Plus">
         添加属性
@@ -23,11 +24,11 @@
         <el-table-column label="操作" align="center" width="200px">
           <template #="{row, $index}">
             <!--修改已有属性的按钮-->
-            <el-button @click="updateAttr(row)" type="success" size="small" icon="Edit"></el-button>
+            <el-button v-has="`btn.Attr.update`" @click="updateAttr(row)" title="修改属性" type="success" size="small" icon="Edit"></el-button>
             <!--删除已有属性的按钮-->
             <el-popconfirm :title="`您确定删除属性${row.attrName}吗？`" @confirm="deleteAttr(row.id)" width="240px">
               <template #reference>
-                <el-button type="danger" size="small" icon="Delete"></el-button>
+                <el-button v-has="`btn.Attr.remove`" title="删除属性" type="danger" size="small" icon="Delete"></el-button>
               </template>
             </el-popconfirm>
           </template>

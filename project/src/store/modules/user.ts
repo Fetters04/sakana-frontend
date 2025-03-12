@@ -9,7 +9,6 @@ import { GET_TOKEN, REMOVE_TOKEN, SET_TOKEN } from '@/utils/token.ts';
 import { anyRoute, asyncRoute, constantRoute } from '@/router/routes';
 import { loginFormData, loginResponseData, userInfoResponseData } from '@/api/user/type';
 import router from '@/router';
-import resetRouter from '@/router';
 // 引入深拷贝方法
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -32,7 +31,8 @@ let useUserStore = defineStore('User', {
       token: GET_TOKEN(),   // 存储用户唯一标识 token
       menuRoutes: constantRoute,   // 存储生成菜单所需数组（路由）
       username: '',
-      avatar: ''
+      avatar: '',
+      buttons: []     // 存储当前用户包含的按钮
     };
   },
   // 异步|逻辑地方
@@ -61,14 +61,23 @@ let useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.username = result.data.username;
         this.avatar = result.data.avatar;
-        // 过滤出当前用户的异步路由
-        let userAsyncRoute = filterAsyncRoute(cloneDeep(asyncRoute), result.data.routes);
-        // 用户可见的菜单
-        this.menuRoutes = [...constantRoute, ...userAsyncRoute, ...anyRoute];
-        // 路由器当前管理只有常量路由，动态追加异步路由、任意路由
-        [...userAsyncRoute, ...anyRoute].forEach((route: any) => {
-          router.addRoute(route);
-        });
+        this.buttons = result.data.buttons;
+        // 如果有角色并且角色有权限
+        if (result.data.routes != null) {
+          // 过滤出当前用户的异步路由
+          let userAsyncRoute = filterAsyncRoute(cloneDeep(asyncRoute), result.data.routes);
+          // 用户可见的菜单
+          this.menuRoutes = [...constantRoute, ...userAsyncRoute, ...anyRoute];
+          // 路由器当前管理只有常量路由，动态追加异步路由、任意路由
+          [...userAsyncRoute, ...anyRoute].forEach((route: any) => {
+            router.addRoute(route);
+          });
+        } else {
+          // 否则只能访问常量路由和任意路由
+          [...constantRoute, ...anyRoute].forEach((route: any) => {
+            router.addRoute(route);
+          });
+        }
         return 'ok';
       } else {
         return Promise.reject('获取用户信息失败');
@@ -83,6 +92,8 @@ let useUserStore = defineStore('User', {
         this.username = '';
         this.avatar = '';
         REMOVE_TOKEN();
+        // 复原 menuRoutes 路由菜单
+        this.menuRoutes = [...constantRoute];
         // 清空动态追加的路由（处理切换角色后还能访问之前角色权限问题）
         router.getRoutes().forEach(route => {
           if (route.name) { // 确保路由有名称
