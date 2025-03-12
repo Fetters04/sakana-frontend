@@ -23,6 +23,7 @@
       <el-table-column label="用户名" align="center" prop="username" show-overflow-tooltip></el-table-column>
       <el-table-column label="呢称" align="center" prop="nickname" show-overflow-tooltip></el-table-column>
       <el-table-column label="用户角色" align="center" prop="roleName" show-overflow-tooltip></el-table-column>
+      <el-table-column label="手机号" align="center" prop="phone"></el-table-column>
       <el-table-column label="创建时间" align="center" width="180px" prop="createTime"></el-table-column>
       <el-table-column label="更新时间" align="center" width="180px" prop="updateTime"></el-table-column>
       <el-table-column label="操作" width="300px">
@@ -64,6 +65,9 @@
         </el-form-item>
         <el-form-item label="密码" prop="password" v-if="!userParams.id">
           <el-input v-model="userParams.password" style="width: 300px" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="userParams.phone" style="width: 300px" placeholder="请输入手机号"></el-input>
         </el-form-item>
       </el-form>
     </template>
@@ -134,7 +138,8 @@ let drawer2 = ref<boolean>(false);
 let userParams = reactive<UserInfo>({
   username: '',
   nickname: '',
-  password: ''
+  password: '',
+  phone: ''
 });
 // 获取Form组件实例
 let formRef = ref<any>();
@@ -183,7 +188,8 @@ const addUser = () => {
     id: 0,
     username: '',
     nickname: '',
-    password: ''
+    password: '',
+    phone: ''
   });
   // 清除上一次校验提示信息
   nextTick(() => {
